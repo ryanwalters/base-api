@@ -4,7 +4,7 @@
   "description": "Wedding Foundry API",
   "main": "server.js",
   "scripts": {
-    "test": "npm test"
+    "test": "lab -c"
   },
   "repository": {
     "type": "git",
@@ -19,5 +19,8 @@
   "private": true,
   "dependencies": {
     "hapi": "^9.0.1"
+  },
+  "devDependencies": {
+    "lab": "^5.15.1"
   }
 }

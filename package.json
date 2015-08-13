@@ -1,0 +1,23 @@
+{
+  "name": "weddingfoundry-api",
+  "version": "0.1.0",
+  "description": "Wedding Foundry API",
+  "main": "server.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://weddingfoundry@bitbucket.org/weddingfoundry/weddingfoundry-api.git"
+  },
+  "keywords": [
+    "wedding",
+    "foundry",
+    "api"
+  ],
+  "author": "Ryan Walters",
+  "private": true,
+  "dependencies": {
+    "hapi": "^9.0.1"
+  }
+}

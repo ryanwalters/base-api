@@ -19,7 +19,7 @@ describe('Users', function () {
         Server.inject(options, function (response) {
             var result = response.result;
 
-            expect(response.statusCode).to.equal(404);
+            expect(response.statusCode).to.equal(200);
             expect(result).to.be.instanceof(Object);
 
             done();

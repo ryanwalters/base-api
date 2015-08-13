@@ -7,6 +7,7 @@
     "test": "lab",
     "coverage": "lab -c"
   },
+  "engine": "node 0.12.x",
   "repository": {
     "type": "git",
     "url": "https://weddingfoundry@bitbucket.org/weddingfoundry/weddingfoundry-api.git"

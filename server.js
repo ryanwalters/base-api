@@ -9,7 +9,7 @@ server.connection({
     port: process.env.PORT || 5000
 });
 
-server.route(Routes);
+server.route(Routes.endpoints);
 
 if (!module.parent) {
     server.start(function() {

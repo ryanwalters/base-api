@@ -1,5 +1,10 @@
 # Wedding Foundry: API
 
+## Setup
+
+1. `npm install`
+2. Create `.env` using the Development Environment Variables found in the below section
+
 ## Usage
 
 `GET` - Reading Data
@@ -10,3 +15,11 @@
 ## Methods
 
 Coming soon
+
+## Development Environment Variables
+
+    DATABASE_URL=postgres://jhfkwpibezsmli:NUU1Iv1_Zp5XwR14Wy_myHk0W1@ec2-54-163-228-0.compute-1.amazonaws.com:5432/deqt4qke1araia?ssl=true
+    NAMECHEAP_API_KEY=4e813fc82db445ab921b13cb40941f43
+    NAMECHEAP_API_USER=weddingfoundry
+    NAMECHEAP_SERVER_URL=https://api.sandbox.namecheap.com/xml.response?
+    NODE_ENV=development

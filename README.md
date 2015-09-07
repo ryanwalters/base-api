@@ -19,7 +19,7 @@ Coming soon
 ## Development Environment Variables
 
     DATABASE_URL=postgres://jhfkwpibezsmli:NUU1Iv1_Zp5XwR14Wy_myHk0W1@ec2-54-163-228-0.compute-1.amazonaws.com:5432/deqt4qke1araia?ssl=true
-    DNSIMPLE_TOKEN=39RdCWgsGmc0nIbJc4XcN3kaligXuBZy
+    DNSIMPLE_TOKEN=pyvcinaX0ir259uRXTcIVqaeWm0ien63
     DNSIMPLE_EMAIL=dnsimple@weddingfoundry.com
     DNSIMPLE_HOSTNAME=api.sandbox.dnsimple.com
     NAMECHEAP_API_KEY=4e813fc82db445ab921b13cb40941f43

@@ -12,8 +12,8 @@ server.connection({
 server.route(Routes.endpoints);
 
 if (!module.parent) {
-    server.start(function() {
-        console.log("Server started", server.info.uri);
+    server.start(function () {
+        console.log('Server started', server.info.uri);
     });
 }
 

@@ -24,9 +24,13 @@
     "hoek": "^3.0.4",
     "joi": "^7.0.1",
     "jot": "https://github.com/ryanwalters/jot/archive/master.tar.gz",
+    "jsonwebtoken": "^5.4.1",
     "pg": "^4.4.3",
     "pg-hstore": "^2.3.2",
     "sequelize": "^3.14.2"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "lodash": "latest"
+  }
 }

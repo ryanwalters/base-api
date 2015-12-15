@@ -6,15 +6,9 @@ const Hoek = require('hoek');
 const Models = require('./api/models');
 const Routes = require('./api/routes');
 
-const server = new Hapi.Server();
+const server = new Hapi.Server(Config.get('/server'));
 
-
-server.connection({
-    port: Config.get('/server/port'),
-    routes: {
-        cors: true
-    }
-});
+server.connection(Config.get('/connection'));
 
 
 // Register authentication strategies
@@ -26,8 +20,8 @@ server.register(require('jot'), (err) => {
 
     // JWT
 
-    server.auth.strategy('jwt', 'jwt', Config.get('/jwt'));
-    server.auth.strategy('jwt-refresh', 'jwt', Config.get ('/jwt'));
+    server.auth.strategy('jwt', 'jwt', Config.get('/auth/jwt'));
+    server.auth.strategy('jwt-refresh', 'jwt', Config.get ('/auth/jwt'));
 
     server.auth.default({
         strategy: 'jwt',

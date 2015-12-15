@@ -1,6 +1,5 @@
 'use strict';
 
-const Config = require('../config/config');
 const Token = require('./controllers/token');
 const User = require('./controllers/user');
 

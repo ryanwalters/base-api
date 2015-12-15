@@ -22,8 +22,10 @@ module.exports = internals.User = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             unique: true
         },
+        display_name: DataTypes.STRING,
         password: DataTypes.STRING,
         salt: DataTypes.UUID,
+        jti: DataTypes.UUID,
         createdAt: {
             allowNull: false,
             defaultValue: DataTypes.NOW,

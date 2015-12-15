@@ -24,7 +24,9 @@ module.exports = {
 
                     const userCreationError = Boom.forbidden();
 
-                    userCreationError.output.payload.messages = error.errors; // todo: omit error.errors.path
+                    if (error.errors) {
+                        userCreationError.output.payload.messages = _.map(error.errors, (error) => _.omit(error, 'path'));
+                    }
 
                     return reply(userCreationError);
                 });

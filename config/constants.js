@@ -4,6 +4,7 @@ module.exports = {
 
     Scopes: Object.freeze({
         ADMIN: 'admin',
-        USER: 'user-{params.id}'
+        USER: 'user',
+        USER_ID: 'user-{params.id}'
     })
 };

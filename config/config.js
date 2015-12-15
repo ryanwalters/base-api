@@ -19,25 +19,35 @@ const config = {
         version: '/v1'
     },
     server: {
+        /*debug: {
+            request: ['error']
+        }*/
+    },
+    connection: {
         port: {
             $filter: 'env',
             production: process.env.PORT,
             $default: 5001
+        },
+        routes: {
+            cors: true
         }
     },
-    jwt: {
-        $filter: 'env',
-        $base: {
-            validateFunc: (request, token, callback) => {
+    auth: {
+        jwt: {
+            $filter: 'env',
+            $base: {
+                validateFunc: (request, token, callback) => {
 
-                return callback(null, true);
+                    return callback(null, true);
+                }
+            },
+            production: {
+                secret: process.env.JWT_SECRET
+            },
+            $default: {
+                secret: 'NotVerySecret'
             }
-        },
-        production: {
-            secret: process.env.JWT_SECRET
-        },
-        $default: {
-            secret: 'NotVerySecret'
         }
     }
 };

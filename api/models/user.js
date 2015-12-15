@@ -4,6 +4,8 @@ const Crypto = require('crypto');
 
 const internals = {};
 
+internals.hash = (password, salt) => Crypto.createHmac('sha256', salt).update(password).digest('hex');
+
 module.exports = internals.User = (sequelize, DataTypes) => {
 
     return sequelize.define('User', {
@@ -42,12 +44,10 @@ module.exports = internals.User = (sequelize, DataTypes) => {
 
                 //models.User.hasOne(models.Tier);
             },
-            hash: (password, salt) => Crypto.createHmac('sha256', salt).update(password).digest('hex')
+            hashPassword: (password, salt) => internals.hash
         },
         instanceMethods: {
-            isValidPassword: (password) => {
-
-            }
+            isValidPassword: (password, hash, salt) => password === internals.hash(hash, salt)
         }
     });
 };

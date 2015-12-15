@@ -1,6 +1,7 @@
 'use strict';
 
 const Config = require('../../config/config');
+const Joi = require('joi');
 const Jwt = require('jsonwebtoken');
 const Scopes = require('../../config/constants').Scopes;
 const UserModel = require('../models').User;
@@ -33,6 +34,18 @@ module.exports = {
 
             // todo: add facebook, gmail, linkedin strategies; 2. if isAuthenticated, continue to 3
 
+            console.log(request.payload);
+
+            UserModel.findOne({
+                where: {
+                    email: request.payload.email
+                }
+            })
+                .then((user) => {
+                    console.log(user.isValidPassword());
+                })
+                .catch((error) => console.log(error));
+
             return reply('generate refresh token');
 
             /*return reply({
@@ -43,6 +56,12 @@ module.exports = {
                     audience: user.username
                 })
             });*/
+        },
+        validate: {
+            payload: {
+                email: Joi.string().email().required(),
+                password: Joi.string().required()
+            }
         }
     }
 };

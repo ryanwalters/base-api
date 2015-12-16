@@ -49,10 +49,10 @@ module.exports = internals.User = (sequelize, DataTypes) => {
 
                 //models.User.hasOne(models.Tier);
             },
-            hashPassword: (password, salt) => internals.hash
+            hashPassword: internals.hash
         },
         instanceMethods: {
-            isValidPassword: (password, hash, salt) => password === internals.hash(hash, salt)
+            hasValidPassword: (password, hash, salt) => hash === internals.hash(password, salt)
         }
     });
 };

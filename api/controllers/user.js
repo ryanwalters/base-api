@@ -5,6 +5,7 @@ const Boom = require('boom');
 const Joi = require('joi');
 const Scopes = require('../../config/constants').Scopes;
 const UserModel = require('../models').User;
+const Uuid = require('uuid');
 
 module.exports = {
 
@@ -13,6 +14,11 @@ module.exports = {
     create: {
         auth: false,
         handler: (request, reply) => {
+
+            const salt = Uuid.v1();
+
+            request.payload.password = UserModel.hashPassword(request.payload.password, salt);
+            request.payload.salt = salt;
 
             UserModel.create(request.payload)
                 .then((user) => reply(
@@ -44,13 +50,28 @@ module.exports = {
 
     // Get user
 
-    find: {
-        auth: {
+    read: {
+        /*auth: {
             scope: [Scopes.ADMIN, Scopes.USER_ID]
-        },
+        },*/
+        auth: false,
         handler: (request, reply) => {
 
-            return reply('find user');
+            UserModel.findOne({
+                where: {
+                    id: request.params.id,
+                    active: true
+                }
+            })
+                .then((user) => {
+
+                    if (!user) {
+                        return reply(Boom.unauthorized('User not found.'));
+                    }
+
+                    return reply(user);
+                })
+                .catch((error) => reply(Boom.badImplementation(error.message)));
         }
     },
 
@@ -59,7 +80,7 @@ module.exports = {
 
     update: {
         auth: {
-            scope: [Scopes.ADMIN, Scopes.USER]
+            scope: [Scopes.ADMIN, Scopes.USER_ID]
         },
         handler: (request, reply) => {
 
@@ -72,7 +93,7 @@ module.exports = {
 
     delete: {
         auth: {
-            scope: [Scopes.ADMIN, Scopes.USER]
+            scope: [Scopes.ADMIN, Scopes.USER_ID]
         },
         handler: (request, reply) => {
 

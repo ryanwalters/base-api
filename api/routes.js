@@ -11,7 +11,7 @@ module.exports = [
     // User
 
     { method: 'POST', path: '/user', config: User.create },
-    { method: 'GET', path: '/user/{id}', config: User.find },
+    { method: 'GET', path: '/user/{id}', config: User.read },
     { method: 'PUT', path: '/user/{id}', config: User.update },
     { method: 'DELETE', path: '/user/{id}', config: User.delete },
 

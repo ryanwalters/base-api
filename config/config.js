@@ -1,7 +1,9 @@
 'use strict';
 
+const Boom = require('boom');
 const Confidence = require('confidence');
 const Package = require('../package');
+const UserModel = require('../api/models').User;
 
 
 // Declare criteria
@@ -36,10 +38,44 @@ const config = {
     auth: {
         jwt: {
             $filter: 'env',
+            production: {
+                secret: process.env.JWT_SECRET
+            },
+            $default: {
+                secret: 'NotVerySecret'
+            }
+        },
+        jwtRefresh: {
+            $filter: 'env',
             $base: {
                 validateFunc: (request, token, callback) => {
 
-                    return callback(null, true);
+                    /**
+                     * Steps:
+                     * 1. look up user
+                     * 2. if found, validate jti
+                     * 3. if valid, continue
+                     */
+
+                    UserModel.findOne({
+                        where: {
+                            id: token.sub,
+                            active: true
+                        }
+                    })
+                        .then((user) => {
+
+                            if (!user) {
+                                return callback(Boom.unauthorized('No user found.'), false);
+                            }
+
+                            if (token.jti === user.jti) {
+                                return callback(null, true);
+                            }
+
+                            return callback(Boom.unauthorized(), false);
+                        })
+                        .catch((error) => callback(Boom.badImplementation(), false));
                 }
             },
             production: {

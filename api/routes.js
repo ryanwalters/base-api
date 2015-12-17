@@ -8,6 +8,10 @@ const User = require('./controllers/user');
 
 module.exports = [
 
+    // Default
+
+    { method: 'GET', path: '/', config: { auth: false, handler: (request, reply) => reply('hello!') } },
+
     // User
 
     { method: 'POST', path: '/user', config: User.create },

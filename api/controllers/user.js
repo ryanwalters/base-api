@@ -127,7 +127,16 @@ module.exports = {
         },
         handler: (request, reply) => {
 
-            return reply('delete user');
+            UserModel.destroy({
+                where: {
+                    id: request.auth.credentials.sub
+                },
+                limit: 1
+            })
+                .then((rowsDeleted) => reply({
+                    rowsDeleted: rowsDeleted
+                }))
+                .catch((error) => reply(Boom.badImplementation(error.message)));
         }
     }
 };

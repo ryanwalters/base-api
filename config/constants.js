@@ -7,12 +7,5 @@ module.exports = {
         REFRESH: 'refresh',
         USER: 'user',
         USER_ID: 'user-{params.id}'
-    }),
-
-    Errors: Object.freeze({
-        USER_NOT_FOUND: {
-            errorCode: 10000,
-            message: 'User not found.'
-        }
     })
 };

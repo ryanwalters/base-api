@@ -107,10 +107,10 @@ module.exports = {
     // Revoke token
 
     revoke: {
-        auth: {
+        /*auth: {
             strategy: false,
             scope: [Scopes.ADMIN, Scopes.USER_ID]
-        },
+        },*/
         handler: (request, reply) => {
 
             /**

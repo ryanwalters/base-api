@@ -51,10 +51,9 @@ module.exports = {
     // Get user
 
     read: {
-        /*auth: {
+        auth: {
             scope: [Scopes.ADMIN, Scopes.USER_ID]
-        },*/
-        auth: false,
+        },
         handler: (request, reply) => {
 
             UserModel.findOne({

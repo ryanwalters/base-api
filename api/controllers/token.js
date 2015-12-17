@@ -10,7 +10,7 @@ const Uuid = require('uuid');
 
 module.exports = {
 
-    // Access token
+    // Generate access token from a refresh token
 
     access: {
         auth: {
@@ -19,7 +19,14 @@ module.exports = {
         },
         handler: (request, reply) => {
 
-            return reply('access token');
+            return reply({
+                accessToken: Jwt.sign({
+                    scope: [`${Scopes.USER}-${request.auth.credentials.sub}`]
+                }, Config.get('/auth/jwtRefresh/secret'), {
+                    expiresIn: 60 * 60,
+                    subject: request.auth.credentials.sub
+                })
+            });
         }
     },
 

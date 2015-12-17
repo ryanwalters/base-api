@@ -10,13 +10,25 @@ const Uuid = require('uuid');
 
 // Declare internals
 
-const internals = {
-    pruneUser: (user) => _.chain(user)
-        .pick(user, ['display_name', 'email', 'username'])
-        .mapKeys((value, key) => _.camelCase(key))
-};
+const internals = {};
+
+internals.fields = ['display_name', 'email', 'username'];
+
+internals.camelizeFields = (user) => _.chain(user)
+    .pick(user, internals.fields)
+    .mapKeys((value, key) => _.camelCase(key))
+    .value();
+
+internals.snakeFields = (user) => _.chain(user)
+    .mapKeys((value, key) => _.snakeCase(key))
+    .pick(user, internals.fields)
+    .value();
+
+
+// User endpoints
 
 module.exports = {
+
 
     // Create user
 
@@ -30,7 +42,7 @@ module.exports = {
             request.payload.salt = salt;
 
             UserModel.create(request.payload)
-                .then((user) => reply(internals.pruneUser(user)))
+                .then((user) => reply(internals.camelizeFields(user)))
                 .catch((error) => {
 
                     const userCreationError = Boom.forbidden();
@@ -73,7 +85,7 @@ module.exports = {
                         return reply(Boom.unauthorized('User not found.'));
                     }
 
-                    return reply(internals.pruneUser(user));
+                    return reply(internals.camelizeFields(user));
                 })
                 .catch((error) => reply(Boom.badImplementation(error.message)));
         }
@@ -88,7 +100,21 @@ module.exports = {
         },
         handler: (request, reply) => {
 
-            return reply('update user');
+            UserModel.update(internals.snakeFields(request.payload), {
+                where: {
+                    id: request.auth.credentials.sub
+                },
+                returning: true
+            })
+                .then((response) => {
+
+                    if (response[0] !== 1) {
+                        return reply(Boom.badImplementation('Must update single row.', { rowsAffected: response[0] }));
+                    }
+
+                    return reply(internals.camelizeFields(response[1][0].dataValues));
+                })
+                .catch((error) => reply(Boom.badImplementation(error.message)));
         }
     },
 

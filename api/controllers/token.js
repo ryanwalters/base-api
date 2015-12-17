@@ -101,5 +101,27 @@ module.exports = {
                 password: Joi.string().required()
             }
         }
+    },
+
+
+    // Revoke token
+
+    revoke: {
+        auth: {
+            strategy: false,
+            scope: [Scopes.ADMIN, Scopes.USER_ID]
+        },
+        handler: (request, reply) => {
+
+            /**
+             * Steps:
+             * 1. validate user somehow, maybe u/p?
+             * 2. generate new jti
+             * 3. update user with new jti
+             * 4. return number of affected rows
+             */
+
+            return reply('revoke refresh token');
+        }
     }
 };

@@ -138,5 +138,29 @@ module.exports = {
                 }))
                 .catch((error) => reply(Boom.badImplementation(error.message)));
         }
+    },
+
+
+    // Update password
+
+    updatePassword: {
+        auth: {
+            scope: [Scopes.ADMIN, Scopes.USER_ID]
+        },
+        handler: (request, reply) => {
+
+            /**
+             * Should this be resetPassword?
+             *
+             * Steps:
+             * 1. validate old password
+             * 2. generate new salt
+             * 3. hash new password
+             * 4. update user with new salt and hash
+             * 5. return status
+             */
+
+            return reply('update password');
+        }
     }
 };

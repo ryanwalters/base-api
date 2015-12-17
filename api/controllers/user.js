@@ -7,6 +7,15 @@ const Scopes = require('../../config/constants').Scopes;
 const UserModel = require('../models').User;
 const Uuid = require('uuid');
 
+
+// Declare internals
+
+const internals = {
+    pruneUser: (user) => _.chain(user)
+        .pick(user, ['display_name', 'email', 'username'])
+        .mapKeys((value, key) => _.camelCase(key))
+};
+
 module.exports = {
 
     // Create user
@@ -21,11 +30,7 @@ module.exports = {
             request.payload.salt = salt;
 
             UserModel.create(request.payload)
-                .then((user) => reply(
-                    _.chain(user)
-                        .pick(user, ['display_name', 'email', 'username'])
-                        .mapKeys((value, key) => _.camelCase(key))
-                ))
+                .then((user) => reply(internals.pruneUser(user)))
                 .catch((error) => {
 
                     const userCreationError = Boom.forbidden();
@@ -68,7 +73,7 @@ module.exports = {
                         return reply(Boom.unauthorized('User not found.'));
                     }
 
-                    return reply(user);
+                    return reply(internals.pruneUser(user));
                 })
                 .catch((error) => reply(Boom.badImplementation(error.message)));
         }

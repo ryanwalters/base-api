@@ -8,6 +8,9 @@ const Scopes = require('../../config/constants').Scopes;
 const UserModel = require('../models').User;
 const Uuid = require('uuid');
 
+
+// Token generation endpoints
+
 module.exports = {
 
     // Generate access token from a refresh token

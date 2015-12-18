@@ -32,7 +32,9 @@ const config = {
             $default: 5001
         },
         routes: {
-            cors: true
+            cors: {
+                origin: ['.weddingfoundry.com']
+            }
         }
     },
     auth: {

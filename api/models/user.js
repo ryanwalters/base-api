@@ -2,9 +2,15 @@
 
 const Crypto = require('crypto');
 
+
+// Declare internals
+
 const internals = {};
 
 internals.hash = (password, salt) => Crypto.createHmac('sha256', salt).update(password).digest('hex');
+
+
+// User Model
 
 module.exports = internals.User = (sequelize, DataTypes) => {
 

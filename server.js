@@ -31,6 +31,7 @@ server.register(require('jot'), (err) => {
 
 server.route(Routes);
 
+
 // Start server
 
 if (!module.parent) {

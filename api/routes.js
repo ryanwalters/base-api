@@ -4,13 +4,14 @@ const Token = require('./controllers/token');
 const User = require('./controllers/user');
 
 
+// Declare internals
+
+const internals = {};
+
+
 // Routes
 
-module.exports = [
-
-    // Default
-
-    { method: 'GET', path: '/', config: { auth: false, handler: (request, reply) => reply('hello!') } },
+internals.routes = [
 
     // User
 
@@ -26,3 +27,18 @@ module.exports = [
     { method: 'POST', path: '/token/access', config: Token.access },
     { method: 'POST', path: '/token/revoke/{id}', config: Token.revoke }
 ];
+
+
+// Plugin
+
+exports.register = (server, options, next) => {
+
+    server.route(internals.routes);
+
+    return next();
+};
+
+exports.register.attributes = {
+    name: 'api-routes',
+    version: '1.0.0'
+};

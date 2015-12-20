@@ -5,13 +5,14 @@ const Hapi = require('hapi');
 const Hoek = require('hoek');
 const Models = require('./api/models');
 const Routes = require('./api/routes');
+const Scopes = require('./config/constants').Scopes;
 
 const server = new Hapi.Server(Config.get('/server'));
 
 server.connection(Config.get('/connection'));
 
 
-// Register authentication strategies
+// Authentication strategies
 
 server.register(require('jot'), (err) => {
 
@@ -25,11 +26,31 @@ server.register(require('jot'), (err) => {
 
     server.auth.default({
         strategy: 'jwt',
-        scope: 'admin'
+        scope: Scopes.ADMIN
     });
 });
 
-server.route(Routes);
+
+// Routes
+
+server.register(require('./api/routes'), {
+    routes: {
+        prefix: Config.get('/api/version')
+    }
+}, (err) => {
+
+    Hoek.assert(!err, err);
+
+
+    // Default, unprefixed route
+
+    server.route({ method: 'GET', path: '/',
+        config: {
+            auth: false,
+            handler: (request, reply) => reply('hello!')
+        }
+    });
+});
 
 
 // Start server

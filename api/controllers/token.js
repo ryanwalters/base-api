@@ -27,6 +27,7 @@ module.exports = {
                     scope: [`${Scopes.USER}-${request.auth.credentials.sub}`]
                 }, Config.get('/auth/jwtRefresh/secret'), {
                     expiresIn: 60 * 60,
+                    issuer: Config.get('/auth/jwtRefresh/issuer'),
                     subject: request.auth.credentials.sub
                 })
             });
@@ -83,6 +84,7 @@ module.exports = {
                                         jti: user.jti,
                                         scope: [Scopes.REFRESH]
                                     }, Config.get('/auth/jwt/secret'), {
+                                        issuer: Config.get('/auth/jwt/issuer'),
                                         subject: user.id
                                     })
                                 });

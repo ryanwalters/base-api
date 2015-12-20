@@ -40,6 +40,9 @@ const config = {
     auth: {
         jwt: {
             $filter: 'env',
+            $base: {
+                issuer: 'weddingfoundry.com'
+            },
             production: {
                 secret: process.env.JWT_SECRET
             },
@@ -50,6 +53,7 @@ const config = {
         jwtRefresh: {
             $filter: 'env',
             $base: {
+                issuer: 'weddingfoundry.com',
                 validateFunc: (request, token, callback) => {
 
                     /**

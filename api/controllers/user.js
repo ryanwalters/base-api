@@ -150,8 +150,6 @@ module.exports = {
         handler: (request, reply) => {
 
             /**
-             * Should this be resetPassword?
-             *
              * Steps:
              * 1. validate old password
              * 2. generate new salt
@@ -160,7 +158,54 @@ module.exports = {
              * 5. return status
              */
 
-            return reply('update password');
+            UserModel.findOne({
+                where: {
+                    id: request.auth.credentials.sub
+                }
+            })
+                .then((user) => {
+
+                    if (!user) {
+                        return reply(Boom.unauthorized('User not found.'));
+                    }
+
+                    if (user.hasValidPassword(request.payload.password, user.password, user.salt)) {
+
+                        if (request.payload.password !== request.payload.newPassword) {
+
+                            user.salt = Uuid.v1();
+                            user.password = UserModel.hashPassword(request.payload.newPassword, user.salt);
+
+                            UserModel.update(user.dataValues, {
+                                    where: {
+                                        id: user.id
+                                    }
+                                })
+                                .then((response) => reply({
+                                    rowsAffected: response[0]
+                                }))
+                                .catch((error) => reply(Boom.badImplementation(error.message)));
+                        }
+
+                        else {
+                            return reply(Boom.unauthorized('New password must be different from previous password.'));
+                        }
+                    }
+
+                    else {
+                        return reply(Boom.unauthorized('Invalid password.'));
+                    }
+
+                    return null;
+                })
+                .catch((error) => reply(Boom.badImplementation(error.message)));
+        },
+        validate: {
+            payload: {
+                password: Joi.string().min(6).required().invalid('newPassword'),
+                newPassword: Joi.string().min(6).required(),
+                confirmPassword: Joi.string().required().valid(Joi.ref('newPassword'))
+            }
         }
     }
 };

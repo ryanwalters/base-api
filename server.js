@@ -4,7 +4,6 @@ const Config = require('./config/config');
 const Hapi = require('hapi');
 const Hoek = require('hoek');
 const Models = require('./api/models');
-const Routes = require('./api/routes');
 const Scopes = require('./config/constants').Scopes;
 
 const server = new Hapi.Server(Config.get('/server'));
@@ -26,7 +25,7 @@ server.register(require('jot'), (err) => {
 
     server.auth.default({
         strategy: 'jwt',
-        scope: Scopes.ADMIN
+        scope: [Scopes.ADMIN]
     });
 });
 

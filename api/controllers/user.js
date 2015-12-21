@@ -229,10 +229,33 @@ module.exports = {
     resetPassword: {
         handler: (request, reply) => {
 
+            /**
+             * Steps
+             * 1. generate new password and salt
+             * 2. hash password
+             * 3. update user with hashed password and salt
+             * 4. email user with new randomly generated password
+             * 5. return rowsAffected
+             */
+
+            UserModel.findOne({
+                where: {
+                    id: request.payload.userId
+                }
+            })
+                .then((user) => {
+
+                    if (!user) {
+                        return reply(Boom.unauthorized('User not found.'));
+                    }
+
+                    // #1
+                })
+                .catch((error) => reply(Boom.badImplementation(error.message)));
         },
         validate: {
             payload: {
-
+                userId: Joi.number().required()
             }
         }
     }

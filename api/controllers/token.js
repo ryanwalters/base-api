@@ -156,6 +156,8 @@ module.exports = {
                             rowsAffected: response[0]
                         }))
                         .catch((error) => reply(Boom.badImplementation(error.message)));
+
+                    return null; // Stops bluebird from complaining...
                 })
                 .catch((error) => reply(Boom.badImplementation(error.message)));
         },

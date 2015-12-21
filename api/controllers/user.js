@@ -12,6 +12,8 @@ const Uuid = require('uuid');
 
 const internals = {};
 
+// todo: move these to user model
+
 internals.fields = ['display_name', 'email', 'username'];
 
 internals.camelizeFields = (user) => _.chain(user)
@@ -217,6 +219,20 @@ module.exports = {
                         }
                     }
                 })
+            }
+        }
+    },
+
+
+    // Reset password
+
+    resetPassword: {
+        handler: (request, reply) => {
+
+        },
+        validate: {
+            payload: {
+
             }
         }
     }

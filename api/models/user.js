@@ -39,6 +39,11 @@ module.exports = internals.User = (sequelize, DataTypes) => {
             defaultValue: true,
             type: DataTypes.BOOLEAN
         },
+        admin: {
+            allowNull: false,
+            defaultValue: false,
+            type: DataTypes.BOOLEAN
+        },
         createdAt: {
             allowNull: false,
             defaultValue: DataTypes.NOW,

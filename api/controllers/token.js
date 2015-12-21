@@ -22,9 +22,15 @@ module.exports = {
         },
         handler: (request, reply) => {
 
+            const scope = [`${Scopes.USER}-${request.auth.credentials.sub}`];
+
+            if (request.auth.credentials.scope.indexOf(Scopes.ADMIN) !== -1) {
+                scope.push(Scopes.ADMIN);
+            }
+
             return reply({
                 accessToken: Jwt.sign({
-                    scope: [`${Scopes.USER}-${request.auth.credentials.sub}`]
+                    scope: scope
                 }, Config.get('/auth/jwtRefresh/secret'), {
                     expiresIn: 60 * 60,
                     issuer: Config.get('/auth/jwtRefresh/issuer'),
@@ -65,6 +71,12 @@ module.exports = {
 
                     if (user.hasValidPassword(request.payload.password, user.password, user.salt)) {
 
+                        const scope = [Scopes.REFRESH];
+
+                        if (user.admin) {
+                            scope.push(Scopes.ADMIN);
+                        }
+
                         user.jti = Uuid.v1();
 
                         UserModel.update(user.dataValues, {
@@ -82,7 +94,7 @@ module.exports = {
                                 return reply({
                                     refreshToken: Jwt.sign({
                                         jti: user.jti,
-                                        scope: [Scopes.REFRESH]
+                                        scope: scope
                                     }, Config.get('/auth/jwt/secret'), {
                                         issuer: Config.get('/auth/jwt/issuer'),
                                         subject: user.id
@@ -112,21 +124,45 @@ module.exports = {
     // Revoke token
 
     revoke: {
-        /*auth: {
-            strategy: false,
-            scope: [Scopes.ADMIN, Scopes.USER_ID]
-        },*/
         handler: (request, reply) => {
 
             /**
              * Steps:
-             * 1. validate user somehow, maybe u/p?
+             * 1. look up user
              * 2. generate new jti
              * 3. update user with new jti
              * 4. return number of affected rows
              */
 
-            return reply('revoke refresh token');
+            UserModel.findOne({
+                where: {
+                    id: request.payload.userId
+                }
+            })
+                .then((user) => {
+
+                    if (!user) {
+                        return reply(Boom.unauthorized('User not found.'));
+                    }
+
+                    user.jti = Uuid.v1();
+
+                    UserModel.update(user.dataValues, {
+                        where: {
+                            id: user.id
+                        }
+                    })
+                        .then((response) => reply({
+                            rowsAffected: response[0]
+                        }))
+                        .catch((error) => reply(Boom.badImplementation(error.message)));
+                })
+                .catch((error) => reply(Boom.badImplementation(error.message)));
+        },
+        validate: {
+            payload: {
+                userId: Joi.number().required()
+            }
         }
     }
 };

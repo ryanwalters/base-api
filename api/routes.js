@@ -20,12 +20,13 @@ internals.routes = [
     { method: 'PUT', path: '/user/{id}', config: User.update },
     { method: 'DELETE', path: '/user/{id}', config: User.delete },
     { method: 'POST', path: '/user/{id}/password/update', config: User.updatePassword },
+    { method: 'POST', path: '/user/password/reset', config: User.resetPassword },
 
     // Tokens
 
     { method: 'POST', path: '/token/refresh', config: Token.refresh },
     { method: 'POST', path: '/token/access', config: Token.access },
-    { method: 'POST', path: '/token/revoke/{id}', config: Token.revoke }
+    { method: 'POST', path: '/token/revoke', config: Token.revoke }
 ];
 
 

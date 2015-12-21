@@ -202,9 +202,21 @@ module.exports = {
         },
         validate: {
             payload: {
-                password: Joi.string().min(6).required().invalid('newPassword'),
                 newPassword: Joi.string().min(6).required(),
-                confirmPassword: Joi.string().required().valid(Joi.ref('newPassword'))
+                confirmPassword: Joi.string().required().valid(Joi.ref('newPassword')).options({
+                    language: {
+                        any: {
+                            allowOnly: '!!new passwords must match'
+                        }
+                    }
+                }),
+                password: Joi.string().min(6).required().invalid(Joi.ref('newPassword')).options({
+                    language: {
+                        any: {
+                            invalid: '!!new password cannot match your current password'
+                        }
+                    }
+                })
             }
         }
     }

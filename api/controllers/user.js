@@ -3,6 +3,7 @@
 const _ = require('lodash');
 const Boom = require('boom');
 const Joi = require('joi');
+const Randomstring = require('randomstring');
 const Scopes = require('../../config/constants').Scopes;
 const UserModel = require('../models').User;
 const Uuid = require('uuid');
@@ -12,7 +13,7 @@ const Uuid = require('uuid');
 
 const internals = {};
 
-// todo: move these to user model
+// todo: move these to user model, or make table names camelCase
 
 internals.fields = ['display_name', 'email', 'username'];
 
@@ -198,7 +199,7 @@ module.exports = {
                         return reply(Boom.unauthorized('Invalid password.'));
                     }
 
-                    return null;
+                    return null; // Stops bluebird from complaining...
                 })
                 .catch((error) => reply(Boom.badImplementation(error.message)));
         },
@@ -234,7 +235,7 @@ module.exports = {
              * 1. generate new password and salt
              * 2. hash password
              * 3. update user with hashed password and salt
-             * 4. email user with new randomly generated password
+             * 4. email user with new randomly generated password // todo
              * 5. return rowsAffected
              */
 
@@ -249,7 +250,28 @@ module.exports = {
                         return reply(Boom.unauthorized('User not found.'));
                     }
 
-                    // #1
+                    const password = Randomstring.generate();
+                    const salt = Uuid.v1();
+
+                    user.password = UserModel.hashPassword(password, salt);
+                    user.salt = salt;
+
+                    UserModel.update(user.dataValues, {
+                        where: {
+                            id: user.id
+                        }
+                    })
+                        .then((response) => {
+
+                            // todo: email user with password
+
+                            return reply({
+                                rowsAffected: response[0]
+                            });
+                        })
+                        .catch((error) => reply(Boom.badImplementation(error.message)));
+
+                    return null; // Stops bluebird from complaining...
                 })
                 .catch((error) => reply(Boom.badImplementation(error.message)));
         },

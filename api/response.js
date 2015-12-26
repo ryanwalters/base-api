@@ -5,7 +5,8 @@ module.exports = class WFResponse {
     constructor() {
 
         this.data = null;
-        this.error = null;
+        this.errorCode = 0;
+        this.errorMessage = null;
     }
 
     set(property, value) {

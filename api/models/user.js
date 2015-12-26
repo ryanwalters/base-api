@@ -56,10 +56,10 @@ module.exports = internals.User = (sequelize, DataTypes) => {
         }
     }, {
         classMethods: {
-            associate: (models) => {
+            /*associate: (models) => {
 
                 //models.User.hasOne(models.Tier);
-            },
+            },*/
             hashPassword: internals.hash
         },
         instanceMethods: {

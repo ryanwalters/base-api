@@ -2,6 +2,8 @@
 
 // Ported from weddingfoundry-dashboard
 
+const internals = {};
+
 module.exports = internals.Tier = (sequelize, DataTypes) => {
 
     return sequelize.define('Tier', {

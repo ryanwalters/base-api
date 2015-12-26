@@ -21,7 +21,7 @@ server.register(require('jot'), (err) => {
     // JWT
 
     server.auth.strategy('jwt', 'jwt', Config.get('/auth/jwt'));
-    server.auth.strategy('jwt-refresh', 'jwt', Config.get ('/auth/jwtRefresh'));
+    server.auth.strategy('jwt-refresh', 'jwt', Config.get('/auth/jwtRefresh'));
 
     server.auth.default({
         strategy: 'jwt',

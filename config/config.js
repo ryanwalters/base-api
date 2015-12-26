@@ -1,6 +1,5 @@
 'use strict';
 
-const Boom = require('boom');
 const Confidence = require('confidence');
 const Package = require('../package');
 const UserModel = require('../api/models').User;
@@ -72,16 +71,16 @@ const config = {
                         .then((user) => {
 
                             if (!user) {
-                                return callback(Boom.unauthorized('No user found.'), false);
+                                return callback('No user found.', false);
                             }
 
                             if (token.jti === user.jti) {
                                 return callback(null, true);
                             }
 
-                            return callback(Boom.unauthorized(), false);
+                            return callback(null, false);
                         })
-                        .catch((error) => callback(Boom.badImplementation(), false));
+                        .catch((error) => callback(error.message, false));
                 }
             },
             production: {

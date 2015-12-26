@@ -174,25 +174,22 @@ module.exports = {
 
                     if (user.hasValidPassword(request.payload.password, user.password, user.salt)) {
 
-                        if (request.payload.password !== request.payload.newPassword) {
-
-                            user.salt = Uuid.v1();
-                            user.password = UserModel.hashPassword(request.payload.newPassword, user.salt);
-
-                            UserModel.update(user.dataValues, {
-                                    where: {
-                                        id: user.id
-                                    }
-                                })
-                                .then((response) => reply({
-                                    rowsAffected: response[0]
-                                }))
-                                .catch((error) => reply(Boom.badImplementation(error.message)));
-                        }
-
-                        else {
+                        if (request.payload.password === request.payload.newPassword) {
                             return reply(Boom.unauthorized('New password must be different from previous password.'));
                         }
+
+                        user.salt = Uuid.v1();
+                        user.password = UserModel.hashPassword(request.payload.newPassword, user.salt);
+
+                        UserModel.update(user.dataValues, {
+                            where: {
+                                id: user.id
+                            }
+                        })
+                            .then((response) => reply({
+                                rowsAffected: response[0]
+                            }))
+                            .catch((error) => reply(Boom.badImplementation(error.message)));
                     }
 
                     else {

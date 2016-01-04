@@ -1,10 +1,12 @@
 'use strict';
 
+const _ = require('lodash');
 const Config = require('./config/config');
 const Hapi = require('hapi');
 const Hoek = require('hoek');
 const Models = require('./api/models');
 const Scopes = require('./config/constants').Scopes;
+const WFResponse = require('./api/response');
 
 const server = new Hapi.Server(Config.get('/server'));
 
@@ -49,6 +51,25 @@ server.register(require('./api/routes'), {
             handler: (request, reply) => reply('hello!')
         }
     });
+});
+
+
+// Format Boom validation errors
+
+server.ext('onPreResponse', (request, reply) => {
+
+    const response = request.response;
+
+    if (response.isBoom && response.data && response.data.name === 'ValidationError') {
+
+        const details = [];
+
+        response.data.details.forEach((detail) => details.push(_.pick(detail, ['message', 'path'])));
+
+        return reply(new WFResponse(40001, null, details));
+    }
+
+    return reply.continue();
 });
 
 

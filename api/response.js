@@ -1,21 +1,42 @@
 'use strict';
 
+const Hoek = require('hoek');
+
+
+// Declare internals
+
+const internals = {
+    STATUS_CODES: Object.setPrototypeOf({
+        '0': 'Ok',
+        '40001': 'Validation error',
+        '40000': 'Unauthorized',
+        '40101': 'Old password used',
+        '40102': 'Password incorrect',
+        '40300': 'Forbidden',
+        '40301': 'Account creation error',
+        '40302': 'User not found',
+        '50000': 'Server error'
+    }, null)
+};
+
+
+// Response class
+
 module.exports = class WFResponse {
 
-    constructor() {
+    constructor(statusCode, data, errorDetails) {
 
-        this.data = null;
-        this.error = null;
-    }
+        const codeNumber = parseInt(statusCode, 10);
 
-    set(property, value) {
+        Hoek.assert(!Number.isNaN(codeNumber), `First argument must be a number: ${codeNumber}`);
+        Hoek.assert(internals.STATUS_CODES[codeNumber] !== undefined, `Invalid status code: ${codeNumber}`);
 
-        if (property in this) {
-            return this[property] = value;
-        }
+        this.data = data || {};
+        this.statusCode = codeNumber;
+        this.message = internals.STATUS_CODES[codeNumber];
 
-        else {
-            throw new Error(`"${property}" is not a valid property`);
+        if (errorDetails) {
+            this.errorDetails = errorDetails;
         }
     }
 };

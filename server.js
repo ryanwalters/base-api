@@ -41,7 +41,7 @@ server.register(require('./api/routes'), {
     Hoek.assert(!err, err);
 
 
-    // Default, unprefixed route
+    // Default, unprefixed route; todo: make these the docs (lout?)
 
     server.route({ method: 'GET', path: '/',
         config: {

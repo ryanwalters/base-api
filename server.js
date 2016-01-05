@@ -61,6 +61,8 @@ server.ext('onPreResponse', (request, reply) => {
 
     const response = request.response;
 
+    console.log(request.server.info.protocol);
+
     if (response.isBoom && response.data && response.data.name === 'ValidationError') {
 
         const details = [];

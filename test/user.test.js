@@ -16,15 +16,15 @@ const server = require('../server');
 
 // User endpoints tests
 
-describe('/user endpoints', () => {
+describe('/v1', () => {
 
-    describe('GET /user', () => {
+    describe('GET /user/1', () => {
 
-        it('fails without valid JWT', (done) => {
+        it('fails without JWT', (done) => {
 
-            server.inject('/user', (res) => {
+            server.inject({ method: 'GET', url: '/v1/user/1' }, (res) => {
 
-                expect(res.statusCode).to.equal(403);
+                expect(res.statusCode).to.equal(401);
                 done();
             });
         });

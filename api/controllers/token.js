@@ -33,9 +33,9 @@ module.exports = {
             return reply({
                 accessToken: Jwt.sign({
                     scope: scope
-                }, Config.get('/auth/jwtRefresh/secret'), {
+                }, Config.get('/auth/jwt/secret'), {
                     expiresIn: 60 * 60,
-                    issuer: Config.get('/auth/jwtRefresh/issuer'),
+                    issuer: Config.get('/auth/jwt/issuer'),
                     subject: request.auth.credentials.sub
                 })
             });

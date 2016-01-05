@@ -2,7 +2,6 @@
 
 const Confidence = require('confidence');
 const Package = require('../package');
-const UserModel = require('./models/index').User;
 
 
 // Declare criteria
@@ -19,10 +18,19 @@ const config = {
     api: {
         version: '/v1'
     },
-    server: {
-        /*debug: {
-            request: ['error']
-        }*/
+    auth: {
+        jwt: {
+            $filter: 'env',
+            $base: {
+                issuer: 'weddingfoundry.com'
+            },
+            production: {
+                secret: process.env.JWT_SECRET
+            },
+            $default: {
+                secret: 'NotVerySecret'
+            }
+        }
     },
     connection: {
         port: {
@@ -36,60 +44,31 @@ const config = {
             }
         }
     },
-    auth: {
-        jwt: {
+    db: {
+        options: {
             $filter: 'env',
-            $base: {
-                issuer: 'weddingfoundry.com'
-            },
-            production: {
-                secret: process.env.JWT_SECRET
-            },
-            $default: {
-                secret: 'NotVerySecret'
-            }
-        },
-        jwtRefresh: {
-            $filter: 'env',
-            $base: {
-                issuer: 'weddingfoundry.com',
-                validateFunc: (request, token, callback) => {
-
-                    /**
-                     * Steps:
-                     * 1. look up user
-                     * 2. if found, validate jti
-                     * 3. if valid, continue
-                     */
-
-                    UserModel.findOne({
-                        where: {
-                            id: token.sub,
-                            active: true
-                        }
-                    })
-                        .then((user) => {
-
-                            if (!user) {
-                                return callback('No user found.', false);
-                            }
-
-                            if (token.jti === user.jti) {
-                                return callback(null, true);
-                            }
-
-                            return callback(null, false);
-                        })
-                        .catch((error) => callback(error.message, false));
+            test: {
+                dialect: {
+                    dialect: 'sqlite'
                 }
             },
-            production: {
-                secret: process.env.JWT_SECRET
-            },
             $default: {
-                secret: 'NotVerySecret'
+                dialect: 'postgres',
+                dialectOptions: {
+                    ssl: true
+                }
             }
+        },
+        url: {
+            $filter: 'env',
+            test: `sqlite://${__dirname}/../test/database.sqlite`,
+            $default: process.env.DATABASE_URL
         }
+    },
+    server: {
+        /*debug: {
+         request: ['error']
+         }*/
     }
 };
 

@@ -4,7 +4,8 @@
   "description": "Wedding Foundry API",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "lab -a code -t 100 -L -v",
+    "test": "lab -a"
   },
   "engines": {
     "node": "^5.0.0"
@@ -40,6 +41,7 @@
     "code": "^2.1.0",
     "gulp": "^3.9.0",
     "gulp-eslint": "^1.1.1",
-    "lab": "^8.0.1"
+    "lab": "^8.0.1",
+    "sqlite3": "^3.1.1"
   }
 }

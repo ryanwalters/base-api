@@ -21,10 +21,42 @@ server.register(require('jot'), (err) => {
     Hoek.assert(!err, err);
 
 
-    // JWT
+    // JWT todo: add validateFunc for jwtOptions
+
+    const jwtRefreshOptions = Config.get('/auth/jwt');
+
+    jwtRefreshOptions.validateFunc = (request, token, callback) => {
+
+        /**
+         * Steps:
+         * 1. look up user
+         * 2. if found, validate jti
+         * 3. if valid, continue
+         */
+
+        Models.User.findOne({
+                where: {
+                    id: token.sub,
+                    active: true
+                }
+            })
+            .then((user) => {
+
+                if (!user) {
+                    return callback('No user found.', false);
+                }
+
+                if (token.jti === user.jti) {
+                    return callback(null, true);
+                }
+
+                return callback(null, false);
+            })
+            .catch((error) => callback(error.message, false));
+    };
 
     server.auth.strategy('jwt', 'jwt', Config.get('/auth/jwt'));
-    server.auth.strategy('jwt-refresh', 'jwt', Config.get('/auth/jwtRefresh'));
+    server.auth.strategy('jwt-refresh', 'jwt', jwtRefreshOptions);
 
     server.auth.default({
         strategy: 'jwt',

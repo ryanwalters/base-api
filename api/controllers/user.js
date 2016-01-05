@@ -62,7 +62,7 @@ module.exports = {
 
                     return reply(new WFResponse(Status.OK, user.safeFields()));
                 })
-                .catch((error) => reply(new WFResponse(Status.SERVER_ERROR)));
+                .catch((error) => reply(new WFResponse(Status.SERVER_ERROR, null, error)));
         }
     },
 
@@ -87,9 +87,9 @@ module.exports = {
                         return reply(new WFResponse(Status.USER_NOT_FOUND));
                     }
 
-                    return reply(new WFResponse(Status.OK, response[1][0].safeFields()))
+                    return reply(new WFResponse(Status.OK, response[1][0].safeFields()));
                 })
-                .catch((error) => reply(new WFResponse(Status.SERVER_ERROR)));
+                .catch((error) => reply(new WFResponse(Status.SERVER_ERROR, null, error)));
         }
     },
 
@@ -109,7 +109,7 @@ module.exports = {
                 limit: 1
             })
                 .then((rowsAffected) => reply(new WFResponse(Status.OK, { rowsAffected: rowsAffected })))
-                .catch((error) => reply(new WFResponse(Status.SERVER_ERROR)));
+                .catch((error) => reply(new WFResponse(Status.SERVER_ERROR, null, error)));
         }
     },
 
@@ -142,34 +142,33 @@ module.exports = {
                         return reply(new WFResponse(Status.USER_NOT_FOUND));
                     }
 
-                    if (user.hasValidPassword(request.payload.password, user.password, user.salt)) {
-
-                        if (request.payload.password !== request.payload.newPassword) {
-
-                            user.salt = Uuid.v1();
-                            user.password = UserModel.hashPassword(request.payload.newPassword, user.salt);
-
-                            UserModel.update(user.dataValues, {
-                                    where: {
-                                        id: user.id
-                                    }
-                                })
-                                .then((response) => reply(new WFResponse(Status.OK, { rowsAffected: response[0] })))
-                                .catch((error) => reply(new WFResponse(Status.SERVER_ERROR)));
-                        }
-
-                        else {
-                            return reply(new WFResponse(Status.OLD_PASSWORD));
-                        }
-                    }
-
-                    else {
+                    if (!user.hasValidPassword(request.payload.password, user.password, user.salt)) {
                         return reply(new WFResponse(Status.PASSWORD_INCORRECT));
                     }
 
+                    if (request.payload.password === request.payload.newPassword) {
+                        return reply(new WFResponse(Status.OLD_PASSWORD));
+                    }
+
+                    user.salt = Uuid.v1();
+                    user.password = UserModel.hashPassword(request.payload.newPassword, user.salt);
+
+                    UserModel.update(user.dataValues, {
+                        where: {
+                            id: user.id
+                        }
+                    })
+                        .then((response) => reply(new WFResponse(Status.OK, { rowsAffected: response[0] })))
+                        .catch((error) => {
+
+                            console.error(error);
+
+                            return reply(new WFResponse(Status.SERVER_ERROR));
+                        });
+
                     return null; // Stops bluebird from complaining...
                 })
-                .catch((error) => reply(new WFResponse(Status.SERVER_ERROR)));
+                .catch((error) => reply(new WFResponse(Status.SERVER_ERROR, null, error)));
         },
         validate: {
             payload: {
@@ -235,11 +234,11 @@ module.exports = {
 
                             return reply(new WFResponse(Status.OK, { rowsAffected: response[0] }));
                         })
-                        .catch((error) => reply(new WFResponse(Status.SERVER_ERROR)));
+                        .catch((error) => reply(new WFResponse(Status.SERVER_ERROR, null, error)));
 
                     return null; // Stops bluebird from complaining...
                 })
-                .catch((error) => reply(new WFResponse(Status.SERVER_ERROR)));
+                .catch((error) => reply(new WFResponse(Status.SERVER_ERROR, null, error)));
         },
         validate: {
             payload: {

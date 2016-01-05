@@ -6,6 +6,7 @@ const Hapi = require('hapi');
 const Hoek = require('hoek');
 const Models = require('./api/models');
 const Scopes = require('./config/constants').Scopes;
+const Status = require('./config/constants').Status;
 const WFResponse = require('./api/response');
 
 const server = new Hapi.Server(Config.get('/server'));
@@ -66,7 +67,7 @@ server.ext('onPreResponse', (request, reply) => {
 
         response.data.details.forEach((detail) => details.push(_.pick(detail, ['message', 'path'])));
 
-        return reply(new WFResponse(40001, null, details));
+        return reply(new WFResponse(Status.VALIDATION_ERROR, null, details));
     }
 
     return reply.continue();

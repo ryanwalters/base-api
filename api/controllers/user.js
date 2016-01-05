@@ -1,9 +1,9 @@
 'use strict';
 
-const _ = require('lodash');
 const Joi = require('joi');
 const Randomstring = require('randomstring');
 const Scopes = require('../../config/constants').Scopes;
+const Status = require('../../config/constants').Status;
 const WFResponse = require('../response');
 const UserModel = require('../models').User;
 const Uuid = require('uuid');
@@ -26,8 +26,8 @@ module.exports = {
             request.payload.salt = salt;
 
             UserModel.create(request.payload)
-                .then((user) => reply(new WFResponse(0, user.safeFields())))
-                .catch((error) => reply(new WFResponse(40301, null, error.errors)));
+                .then((user) => reply(new WFResponse(Status.OK, user.safeFields())))
+                .catch((error) => reply(new WFResponse(Status.ACCOUNT_CREATION_ERROR, null, error.errors)));
         },
         validate: {
             payload: {
@@ -57,12 +57,12 @@ module.exports = {
                 .then((user) => {
 
                     if (!user) {
-                        return reply(new WFResponse(40302));
+                        return reply(new WFResponse(Status.USER_NOT_FOUND));
                     }
 
-                    return reply(new WFResponse(0, user.safeFields()));
+                    return reply(new WFResponse(Status.OK, user.safeFields()));
                 })
-                .catch((error) => reply(new WFResponse(50000)));
+                .catch((error) => reply(new WFResponse(Status.SERVER_ERROR)));
         }
     },
 
@@ -77,12 +77,19 @@ module.exports = {
 
             UserModel.update(request.payload, {
                 where: {
-                    id: request.auth.credentials.sub
+                    id: request.params.id
                 },
                 returning: true
             })
-                .then((response) => reply(new WFResponse(0, response[1][0].safeFields())))
-                .catch((error) => reply(new WFResponse(50000)));
+                .then((response) => {
+
+                    if (response[0] === 0) {
+                        return reply(new WFResponse(Status.USER_NOT_FOUND));
+                    }
+
+                    return reply(new WFResponse(Status.OK, response[1][0].safeFields()))
+                })
+                .catch((error) => reply(new WFResponse(Status.SERVER_ERROR)));
         }
     },
 
@@ -101,8 +108,8 @@ module.exports = {
                 },
                 limit: 1
             })
-                .then((rowsAffected) => reply(new WFResponse(0, { rowsAffected: rowsAffected })))
-                .catch((error) => reply(new WFResponse(50000)));
+                .then((rowsAffected) => reply(new WFResponse(Status.OK, { rowsAffected: rowsAffected })))
+                .catch((error) => reply(new WFResponse(Status.SERVER_ERROR)));
         }
     },
 
@@ -132,7 +139,7 @@ module.exports = {
                 .then((user) => {
 
                     if (!user) {
-                        return reply(new WFResponse(40302));
+                        return reply(new WFResponse(Status.USER_NOT_FOUND));
                     }
 
                     if (user.hasValidPassword(request.payload.password, user.password, user.salt)) {
@@ -147,22 +154,22 @@ module.exports = {
                                         id: user.id
                                     }
                                 })
-                                .then((response) => reply(new WFResponse(0, { rowsAffected: response[0] })))
-                                .catch((error) => reply(new WFResponse(50000)));
+                                .then((response) => reply(new WFResponse(Status.OK, { rowsAffected: response[0] })))
+                                .catch((error) => reply(new WFResponse(Status.SERVER_ERROR)));
                         }
 
                         else {
-                            return reply(new WFResponse(40101));
+                            return reply(new WFResponse(Status.OLD_PASSWORD));
                         }
                     }
 
                     else {
-                        return reply(new WFResponse(40102));
+                        return reply(new WFResponse(Status.PASSWORD_INCORRECT));
                     }
 
                     return null; // Stops bluebird from complaining...
                 })
-                .catch((error) => reply(new WFResponse(50000)));
+                .catch((error) => reply(new WFResponse(Status.SERVER_ERROR)));
         },
         validate: {
             payload: {
@@ -208,7 +215,7 @@ module.exports = {
                 .then((user) => {
 
                     if (!user) {
-                        return reply(new WFResponse(40302));
+                        return reply(new WFResponse(Status.USER_NOT_FOUND));
                     }
 
                     const password = Randomstring.generate();
@@ -226,13 +233,13 @@ module.exports = {
 
                             // todo: email user with password
 
-                            return reply(new WFResponse(0, { rowsAffected: response[0] }));
+                            return reply(new WFResponse(Status.OK, { rowsAffected: response[0] }));
                         })
-                        .catch((error) => reply(new WFResponse(50000)));
+                        .catch((error) => reply(new WFResponse(Status.SERVER_ERROR)));
 
                     return null; // Stops bluebird from complaining...
                 })
-                .catch((error) => reply(new WFResponse(50000)));
+                .catch((error) => reply(new WFResponse(Status.SERVER_ERROR)));
         },
         validate: {
             payload: {

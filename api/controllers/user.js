@@ -44,7 +44,9 @@ module.exports = {
 
     read: {
         auth: {
-            scope: [Scopes.ADMIN, Scopes.USER_ID]
+            access: {
+                scope: [Scopes.ADMIN, Scopes.USER_ID]
+            }
         },
         handler: (request, reply) => {
 
@@ -71,7 +73,9 @@ module.exports = {
 
     update: {
         auth: {
-            scope: [Scopes.ADMIN, Scopes.USER_ID]
+            access: {
+                scope: [Scopes.ADMIN, Scopes.USER_ID]
+            }
         },
         handler: (request, reply) => {
 
@@ -98,7 +102,9 @@ module.exports = {
 
     delete: {
         auth: {
-            scope: [Scopes.ADMIN, Scopes.USER_ID]
+            access: {
+                scope: [Scopes.ADMIN, Scopes.USER_ID]
+            }
         },
         handler: (request, reply) => {
 
@@ -118,7 +124,9 @@ module.exports = {
 
     updatePassword: {
         auth: {
-            scope: [Scopes.ADMIN, Scopes.USER_ID]
+            access: {
+                scope: [Scopes.ADMIN, Scopes.USER_ID]
+            }
         },
         handler: (request, reply) => {
 

@@ -18,7 +18,9 @@ module.exports = {
     access: {
         auth: {
             strategy: 'jwt-refresh',
-            scope: [Scopes.REFRESH]
+            access: {
+                scope: [Scopes.REFRESH]
+            }
         },
         handler: (request, reply) => {
 

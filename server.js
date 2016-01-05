@@ -1,12 +1,12 @@
 'use strict';
 
 const _ = require('lodash');
-const Config = require('./config/config');
+const Config = require('./api/config');
 const Hapi = require('hapi');
 const Hoek = require('hoek');
 const Models = require('./api/models');
-const Scopes = require('./config/constants').Scopes;
-const Status = require('./config/constants').Status;
+const Scopes = require('./api/constants').Scopes;
+const Status = require('./api/constants').Status;
 const WFResponse = require('./api/response');
 
 const server = new Hapi.Server(Config.get('/server'));

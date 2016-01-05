@@ -1,10 +1,10 @@
 'use strict';
 
 const Boom = require('boom');
-const Config = require('../../config/config');
+const Config = require('../config');
 const Joi = require('joi');
 const Jwt = require('jsonwebtoken');
-const Scopes = require('../../config/constants').Scopes;
+const Scopes = require('../constants').Scopes;
 const UserModel = require('../models').User;
 const Uuid = require('uuid');
 

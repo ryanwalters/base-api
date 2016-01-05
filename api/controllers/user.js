@@ -2,8 +2,8 @@
 
 const Joi = require('joi');
 const Randomstring = require('randomstring');
-const Scopes = require('../../config/constants').Scopes;
-const Status = require('../../config/constants').Status;
+const Scopes = require('../constants').Scopes;
+const Status = require('../constants').Status;
 const WFResponse = require('../response');
 const UserModel = require('../models').User;
 const Uuid = require('uuid');

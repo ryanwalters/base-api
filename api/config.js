@@ -2,7 +2,7 @@
 
 const Confidence = require('confidence');
 const Package = require('../package');
-const UserModel = require('../api/models').User;
+const UserModel = require('./models/index').User;
 
 
 // Declare criteria

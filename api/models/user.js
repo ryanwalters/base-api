@@ -1,5 +1,6 @@
 'use strict';
 
+const _ = require('lodash');
 const Crypto = require('crypto');
 
 
@@ -8,6 +9,7 @@ const Crypto = require('crypto');
 const internals = {};
 
 internals.hash = (password, salt) => Crypto.createHmac('sha256', salt).update(password).digest('hex');
+internals.safeFields = ['displayName', 'email', 'username'];
 
 
 // User Model
@@ -30,7 +32,7 @@ module.exports = internals.User = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             unique: true
         },
-        display_name: DataTypes.STRING,
+        displayName: DataTypes.STRING,
         password: DataTypes.STRING,
         salt: DataTypes.UUID,
         jti: DataTypes.UUID,
@@ -63,7 +65,10 @@ module.exports = internals.User = (sequelize, DataTypes) => {
             hashPassword: internals.hash
         },
         instanceMethods: {
-            hasValidPassword: (password, hash, salt) => hash === internals.hash(password, salt)
+            hasValidPassword: (password, hash, salt) => hash === internals.hash(password, salt),
+            safeFields: function () { // Apparently sequelize doesn't full support es6
+                return _.pick(this, internals.safeFields);
+            }
         }
     });
 };

@@ -1,31 +1,12 @@
 'use strict';
 
 const _ = require('lodash');
-const Boom = require('boom');
 const Joi = require('joi');
 const Randomstring = require('randomstring');
 const Scopes = require('../../config/constants').Scopes;
+const WFResponse = require('../response');
 const UserModel = require('../models').User;
 const Uuid = require('uuid');
-
-
-// Declare internals
-
-const internals = {};
-
-// todo: move these to user model, or make table names camelCase
-
-internals.fields = ['display_name', 'email', 'username'];
-
-internals.camelizeFields = (user) => _.chain(user)
-    .pick(user, internals.fields)
-    .mapKeys((value, key) => _.camelCase(key))
-    .value();
-
-internals.snakeFields = (user) => _.chain(user)
-    .mapKeys((value, key) => _.snakeCase(key))
-    .pick(user, internals.fields)
-    .value();
 
 
 // User endpoints
@@ -45,24 +26,15 @@ module.exports = {
             request.payload.salt = salt;
 
             UserModel.create(request.payload)
-                .then((user) => reply(internals.camelizeFields(user)))
-                .catch((error) => {
-
-                    const userCreationError = Boom.forbidden();
-
-                    if (error.errors) {
-                        userCreationError.output.payload.messages = _.map(error.errors, (error) => _.omit(error, 'path'));
-                    }
-
-                    return reply(userCreationError);
-                });
+                .then((user) => reply(new WFResponse(0, user.safeFields())))
+                .catch((error) => reply(new WFResponse(40301, null, error.errors)));
         },
         validate: {
             payload: {
                 username: Joi.string().alphanum().min(3).max(30).required(),
                 email: Joi.string().email().required(),
                 password: Joi.string().min(6).required(),
-                display_name: Joi.string().min(3).max(30)
+                displayName: Joi.string().min(3).max(30)
             }
         }
     },
@@ -85,12 +57,12 @@ module.exports = {
                 .then((user) => {
 
                     if (!user) {
-                        return reply(Boom.unauthorized('User not found.'));
+                        return reply(new WFResponse(40302));
                     }
 
-                    return reply(internals.camelizeFields(user));
+                    return reply(new WFResponse(0, user.safeFields()));
                 })
-                .catch((error) => reply(Boom.badImplementation(error.message)));
+                .catch((error) => reply(new WFResponse(50000)));
         }
     },
 
@@ -103,21 +75,14 @@ module.exports = {
         },
         handler: (request, reply) => {
 
-            UserModel.update(internals.snakeFields(request.payload), {
+            UserModel.update(request.payload, {
                 where: {
                     id: request.auth.credentials.sub
                 },
                 returning: true
             })
-                .then((response) => {
-
-                    if (response[0] !== 1) {
-                        return reply(Boom.badImplementation('Must update single row.', { rowsAffected: response[0] }));
-                    }
-
-                    return reply(internals.camelizeFields(response[1][0].dataValues));
-                })
-                .catch((error) => reply(Boom.badImplementation(error.message)));
+                .then((response) => reply(new WFResponse(0, response[1][0].safeFields())))
+                .catch((error) => reply(new WFResponse(50000)));
         }
     },
 
@@ -136,10 +101,8 @@ module.exports = {
                 },
                 limit: 1
             })
-                .then((rowsDeleted) => reply({
-                    rowsDeleted: rowsDeleted
-                }))
-                .catch((error) => reply(Boom.badImplementation(error.message)));
+                .then((rowsAffected) => reply(new WFResponse(0, { rowsAffected: rowsAffected })))
+                .catch((error) => reply(new WFResponse(50000)));
         }
     },
 
@@ -169,36 +132,37 @@ module.exports = {
                 .then((user) => {
 
                     if (!user) {
-                        return reply(Boom.unauthorized('User not found.'));
+                        return reply(new WFResponse(40302));
                     }
 
                     if (user.hasValidPassword(request.payload.password, user.password, user.salt)) {
 
-                        if (request.payload.password === request.payload.newPassword) {
-                            return reply(Boom.unauthorized('New password must be different from previous password.'));
+                        if (request.payload.password !== request.payload.newPassword) {
+
+                            user.salt = Uuid.v1();
+                            user.password = UserModel.hashPassword(request.payload.newPassword, user.salt);
+
+                            UserModel.update(user.dataValues, {
+                                    where: {
+                                        id: user.id
+                                    }
+                                })
+                                .then((response) => reply(new WFResponse(0, { rowsAffected: response[0] })))
+                                .catch((error) => reply(new WFResponse(50000)));
                         }
 
-                        user.salt = Uuid.v1();
-                        user.password = UserModel.hashPassword(request.payload.newPassword, user.salt);
-
-                        UserModel.update(user.dataValues, {
-                            where: {
-                                id: user.id
-                            }
-                        })
-                            .then((response) => reply({
-                                rowsAffected: response[0]
-                            }))
-                            .catch((error) => reply(Boom.badImplementation(error.message)));
+                        else {
+                            return reply(new WFResponse(40101));
+                        }
                     }
 
                     else {
-                        return reply(Boom.unauthorized('Invalid password.'));
+                        return reply(new WFResponse(40102));
                     }
 
                     return null; // Stops bluebird from complaining...
                 })
-                .catch((error) => reply(Boom.badImplementation(error.message)));
+                .catch((error) => reply(new WFResponse(50000)));
         },
         validate: {
             payload: {
@@ -244,7 +208,7 @@ module.exports = {
                 .then((user) => {
 
                     if (!user) {
-                        return reply(Boom.unauthorized('User not found.'));
+                        return reply(new WFResponse(40302));
                     }
 
                     const password = Randomstring.generate();
@@ -262,15 +226,13 @@ module.exports = {
 
                             // todo: email user with password
 
-                            return reply({
-                                rowsAffected: response[0]
-                            });
+                            return reply(new WFResponse(0, { rowsAffected: response[0] }));
                         })
-                        .catch((error) => reply(Boom.badImplementation(error.message)));
+                        .catch((error) => reply(new WFResponse(50000)));
 
                     return null; // Stops bluebird from complaining...
                 })
-                .catch((error) => reply(Boom.badImplementation(error.message)));
+                .catch((error) => reply(new WFResponse(50000)));
         },
         validate: {
             payload: {

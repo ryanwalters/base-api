@@ -2,12 +2,13 @@
 
 const Confidence = require('confidence');
 const Package = require('../package');
+const Path = require('path');
 
 
 // Declare criteria
 
 const criteria = {
-    env: process.env.NODE_ENV || 'development'
+    env: process.env.NODE_ENV
 };
 
 
@@ -45,6 +46,11 @@ const config = {
         }
     },
     db: {
+        forceSync: {
+            $filter: 'env',
+            test: true,
+            $default: false
+        },
         options: {
             $filter: 'env',
             test: {
@@ -61,15 +67,11 @@ const config = {
         },
         url: {
             $filter: 'env',
-            test: `sqlite://${__dirname}/../test/database.sqlite`,
+            test: Path.join('sqlite://', __dirname, '../test/database.sqlite'),
             $default: process.env.DATABASE_URL
         }
     },
-    server: {
-        /*debug: {
-         request: ['error']
-         }*/
-    }
+    server: {}
 };
 
 const store = new Confidence.Store(config);

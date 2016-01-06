@@ -46,17 +46,11 @@ const config = {
         }
     },
     db: {
-        forceSync: {
-            $filter: 'env',
-            test: true,
-            $default: false
-        },
         options: {
             $filter: 'env',
             test: {
-                dialect: {
-                    dialect: 'sqlite'
-                }
+                dialect: 'sqlite',
+                logging: false
             },
             $default: {
                 dialect: 'postgres',

@@ -12,8 +12,4 @@ internals.db = {
     User: sequelize.import(__dirname + '/user')
 };
 
-if (Config.get('/db/forceSync')) {
-    internals.db.sequelize.sync({ force: true });
-}
-
 module.exports = internals.db;

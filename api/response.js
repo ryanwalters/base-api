@@ -1,5 +1,6 @@
 'use strict';
 
+const Config = require('./config');
 const Hoek = require('hoek');
 
 
@@ -18,7 +19,7 @@ module.exports = class WFResponse {
         this.statusCode = codeNumber;
         this.message = status.message;
 
-        if (errorDetails && codeNumber < 50000) {
+        if (errorDetails && Config.get('/showServerErrors')) {
             this.errorDetails = errorDetails;
         }
     }

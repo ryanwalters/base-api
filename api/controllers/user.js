@@ -30,12 +30,12 @@ module.exports = {
                 .catch((error) => reply(new WFResponse(Status.ACCOUNT_CREATION_ERROR, null, error.errors)));
         },
         validate: {
-            payload: {
+            payload: Joi.object({
                 username: Joi.string().alphanum().min(3).max(30).required(),
                 email: Joi.string().email().required(),
                 password: Joi.string().min(6).required(),
                 displayName: Joi.string().min(3).max(30)
-            }
+            }).options({ abortEarly: false })
         }
     },
 
@@ -179,7 +179,7 @@ module.exports = {
                 .catch((error) => reply(new WFResponse(Status.SERVER_ERROR, null, error)));
         },
         validate: {
-            payload: {
+            payload: Joi.object({
                 newPassword: Joi.string().min(6).required(),
                 confirmPassword: Joi.string().required().valid(Joi.ref('newPassword')).options({
                     language: {
@@ -195,7 +195,7 @@ module.exports = {
                         }
                     }
                 })
-            }
+            }).options({ abortEarly: false })
         }
     },
 

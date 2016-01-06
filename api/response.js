@@ -18,13 +18,8 @@ module.exports = class WFResponse {
         this.statusCode = codeNumber;
         this.message = status.message;
 
-        if (errorDetails) {
-
-            console.error(errorDetails);
-
-            if (codeNumber < 50000) {
-                this.errorDetails = errorDetails;
-            }
+        if (errorDetails && codeNumber < 50000) {
+            this.errorDetails = errorDetails;
         }
     }
 };

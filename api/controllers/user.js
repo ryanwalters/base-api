@@ -94,6 +94,13 @@ module.exports = {
                     return reply(new WFResponse(Status.OK, response[1][0].getSafeFields()));
                 })
                 .catch((error) => reply(new WFResponse(Status.SERVER_ERROR, null, error)));
+        },
+        validate: {
+            payload: Joi.object({
+                username: Joi.string().alphanum().min(3).max(30),
+                email: Joi.string().email(),
+                displayName: Joi.string().min(3).max(30)
+            }).options({ abortEarly: false })
         }
     },
 

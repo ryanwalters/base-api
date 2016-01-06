@@ -75,10 +75,6 @@ module.exports = {
 
                         const scope = [Scopes.REFRESH];
 
-                        if (user.admin) {
-                            scope.push(Scopes.ADMIN);
-                        }
-
                         user.jti = Uuid.v1();
 
                         UserModel.update(user.dataValues, {

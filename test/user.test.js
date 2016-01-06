@@ -130,35 +130,53 @@ describe('/v1/user', () => {
     describe('GET /{userId} - user details', () => {
 
 
-        // Make user an admin and get an access token
+        // Retrieve access tokens for normal and admin users
 
         let accessToken;
+        let adminAccessToken;
 
         before((done) => {
 
-            Models.User.update({ admin: true }, {
-                where: {
-                    id: 1
-                }
-            })
-                .then(() => {
+            let refreshToken;
 
-                    server.inject({ method: 'POST', url: '/v1/token/refresh',
-                        payload: _.pick(internals.user, ['email', 'password'])
-                    }, (res) => {
 
-                        const refreshToken = res.result.refreshToken;
+            // Get refresh token
 
-                        server.inject({ method: 'POST', url: '/v1/token/access',
-                            headers: { authorization: refreshToken }
-                        }, (res) => {
+            server.inject({ method: 'POST', url: '/v1/token/refresh',
+                payload: _.pick(internals.user, ['email', 'password'])
+            }, (res) => {
 
-                            accessToken = res.result.accessToken;
+                refreshToken = res.result.refreshToken;
 
-                            done();
+
+                // Get normal access token
+
+                server.inject({ method: 'POST', url: '/v1/token/access',
+                    headers: { authorization: refreshToken }
+                }, (res) => {
+
+                    accessToken = res.result.accessToken;
+
+
+                    // Make user an admin and get the admin access token
+
+                    Models.User.update({ admin: true }, {
+                        where: {
+                            id: 1
+                        }
+                    })
+                        .then(() => {
+
+                            server.inject({ method: 'POST', url: '/v1/token/access',
+                                headers: { authorization: refreshToken }
+                            }, (res) => {
+
+                                adminAccessToken = res.result.accessToken;
+                                done();
+                            });
                         });
-                    });
                 });
+            });
         });
 
 
@@ -182,7 +200,7 @@ describe('/v1/user', () => {
 
         // Tests
 
-        it('fails without JWT', (done) => {
+        it('fails without jwt', (done) => {
 
             delete options.headers;
 
@@ -207,8 +225,20 @@ describe('/v1/user', () => {
             });
         });
 
+        it('fails when user has insufficient scope', (done) => {
+
+            options.url = '/v1/user/123';
+
+            server.inject(options, (res) => {
+
+                expect(res.statusCode).to.equal(403);
+                done();
+            });
+        });
+
         it('fails when user does not exist', (done) => {
 
+            options.headers.authorization = adminAccessToken;
             options.url = '/v1/user/123';
 
             server.inject(options, (res) => {

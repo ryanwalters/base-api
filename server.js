@@ -46,8 +46,12 @@ server.register(require('jot'), (err) => {
                     return callback('No user found.', false);
                 }
 
+                if (user.admin) {
+                    token.scope.push(Scopes.ADMIN);
+                }
+
                 if (token.jti === user.jti) {
-                    return callback(null, true);
+                    return callback(null, true, token);
                 }
 
                 return callback(null, false);

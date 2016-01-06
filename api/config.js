@@ -65,7 +65,12 @@ const config = {
             $default: process.env.DATABASE_URL
         }
     },
-    server: {}
+    server: {},
+    showServerErrors: {
+        $filter: 'env',
+        production: false,
+        $default: true
+    }
 };
 
 const store = new Confidence.Store(config);

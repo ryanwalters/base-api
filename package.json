@@ -4,8 +4,7 @@
   "description": "Wedding Foundry API",
   "main": "server.js",
   "scripts": {
-    "test": "lab -a code -t 100 -L -v",
-    "test": "lab -a"
+    "test": "lab -a code -t 100 -L -v"
   },
   "engines": {
     "node": "^5.0.0"

@@ -21,7 +21,7 @@ server.register(require('jot'), (err) => {
     Hoek.assert(!err, err);
 
 
-    // JWT todo: add validateFunc for jwtOptions
+    // JWT
 
     const jwtRefreshOptions = Config.get('/auth/jwt');
 
@@ -35,11 +35,11 @@ server.register(require('jot'), (err) => {
          */
 
         Models.User.findOne({
-                where: {
-                    id: token.sub,
-                    active: true
-                }
-            })
+            where: {
+                id: token.sub,
+                active: true
+            }
+        })
             .then((user) => {
 
                 if (!user) {

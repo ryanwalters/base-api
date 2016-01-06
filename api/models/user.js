@@ -58,15 +58,12 @@ module.exports = internals.User = (sequelize, DataTypes) => {
         }
     }, {
         classMethods: {
-            /*associate: (models) => {
-
-                //models.User.hasOne(models.Tier);
-            },*/
-            hashPassword: internals.hash
+            hashPassword: internals.hash,
+            safeFields: internals.safeFields
         },
         instanceMethods: {
             hasValidPassword: (password, hash, salt) => hash === internals.hash(password, salt),
-            safeFields: function () { // Apparently sequelize doesn't full support es6
+            getSafeFields: function () { // Apparently sequelize doesn't fully support es6
                 return _.pick(this, internals.safeFields);
             }
         }

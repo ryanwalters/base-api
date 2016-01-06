@@ -26,7 +26,7 @@ module.exports = {
             request.payload.salt = salt;
 
             UserModel.create(request.payload)
-                .then((user) => reply(new WFResponse(Status.OK, user.safeFields())))
+                .then((user) => reply(new WFResponse(Status.OK, user.getSafeFields())))
                 .catch((error) => reply(new WFResponse(Status.ACCOUNT_CREATION_ERROR, null, error.errors)));
         },
         validate: {
@@ -62,7 +62,7 @@ module.exports = {
                         return reply(new WFResponse(Status.USER_NOT_FOUND));
                     }
 
-                    return reply(new WFResponse(Status.OK, user.safeFields()));
+                    return reply(new WFResponse(Status.OK, user.getSafeFields()));
                 })
                 .catch((error) => reply(new WFResponse(Status.SERVER_ERROR, null, error)));
         }
@@ -91,7 +91,7 @@ module.exports = {
                         return reply(new WFResponse(Status.USER_NOT_FOUND));
                     }
 
-                    return reply(new WFResponse(Status.OK, response[1][0].safeFields()));
+                    return reply(new WFResponse(Status.OK, response[1][0].getSafeFields()));
                 })
                 .catch((error) => reply(new WFResponse(Status.SERVER_ERROR, null, error)));
         }

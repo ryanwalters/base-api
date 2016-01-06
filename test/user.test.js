@@ -1,5 +1,6 @@
 'use strict';
 
+const _ = require('lodash');
 const Code = require('code');
 const Lab = require('lab');
 const Status = require('../api/constants').Status;
@@ -16,6 +17,18 @@ const before = lab.before;
 const beforeEach = lab.beforeEach;
 
 const server = require('../server');
+
+
+// Declare internals
+
+const internals = {
+    user: {
+        username: 'test',
+        password: '123456',
+        email: 'test@weddingfoundry.com',
+        displayName: 'John Doe'
+    }
+};
 
 
 // User tests
@@ -67,12 +80,7 @@ describe('/v1/user', () => {
 
         it('successfully creates user', (done) => {
 
-            options.payload = {
-                username: 'test',
-                password: 'password',
-                email: 'test@weddingfoundry.com',
-                displayName: 'John Doe'
-            };
+            options.payload = internals.user;
 
             server.inject(options, (res) => {
 
@@ -90,12 +98,7 @@ describe('/v1/user', () => {
 
         it('fails when user exists', (done) => {
 
-            options.payload = {
-                username: 'test',
-                password: 'password',
-                email: 'test@weddingfoundry.com',
-                displayName: 'John Doe'
-            };
+            options.payload = internals.user;
 
             server.inject(options, (res) => {
 
@@ -117,11 +120,96 @@ describe('/v1/user', () => {
 
     describe('GET /{userId} - user details', () => {
 
+
+        // Make user an admin and get an access token
+
+        let accessToken;
+
+        before((done) => {
+
+            Models.User.update({ admin: true }, {
+                where: {
+                    id: 1
+                }
+            })
+                .then(() => {
+
+                    server.inject({ method: 'POST', url: '/v1/token/refresh',
+                        payload: _.pick(internals.user, ['email', 'password'])
+                    }, (res) => {
+
+                        const refreshToken = res.result.refreshToken;
+
+                        server.inject({ method: 'POST', url: '/v1/token/access',
+                            headers: { authorization: refreshToken }
+                        }, (res) => {
+
+                            accessToken = res.result.accessToken;
+
+                            done();
+                        });
+                    });
+                });
+        });
+
+
+        // Set route options
+
+        let options;
+
+        beforeEach((done) => {
+
+            options = {
+                method: 'GET',
+                url: '/v1/user/1',
+                headers: {
+                    authorization: accessToken
+                }
+            };
+
+            done();
+        });
+
+
+        // Tests
+
         it('fails without JWT', (done) => {
 
-            server.inject({ method: 'GET', url: '/v1/user/1' }, (res) => {
+            delete options.headers;
+
+            server.inject(options, (res) => {
 
                 expect(res.statusCode).to.equal(401);
+                done();
+            });
+        });
+
+        it('successfully retrieves user details', (done) => {
+
+            server.inject(options, (res) => {
+
+                const result = res.result;
+
+                expect(res.statusCode).to.equal(200);
+                expect(result.statusCode).to.equal(Status.OK.statusCode);
+                expect(result.message).to.equal(Status.OK.message);
+                expect(result.data).to.deep.equal(_.omit(internals.user, 'password'));
+                done();
+            });
+        });
+
+        it('fails when user does not exist', (done) => {
+
+            options.url = '/v1/user/123';
+
+            server.inject(options, (res) => {
+
+                const result = res.result;
+
+                expect(res.statusCode).to.equal(200);
+                expect(result.statusCode).to.equal(Status.USER_NOT_FOUND.statusCode);
+                expect(result.message).to.equal(Status.USER_NOT_FOUND.message);
+                expect(result.data).to.be.empty();
                 done();
             });
         });

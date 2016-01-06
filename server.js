@@ -112,10 +112,12 @@ server.ext('onPreResponse', (request, reply) => {
 
 // Start server
 
+/* $lab:coverage:off$ */
 if (!module.parent) {
     Models.sequelize.sync(/*{ force: true }*/).then(() => {
         server.start(() => console.log('Server started', server.info.uri));
     });
 }
+/* $lab:coverage:on$ */
 
 module.exports = server;

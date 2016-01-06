@@ -18,9 +18,9 @@ internals.routes = [
     { method: 'POST', path: '/user', config: User.create },
     { method: 'GET', path: '/user/{id}', config: User.read },
     { method: 'PUT', path: '/user/{id}', config: User.update },
-    { method: 'DELETE', path: '/user/{id}', config: User.delete },
     { method: 'POST', path: '/user/{id}/password/update', config: User.updatePassword },
     { method: 'POST', path: '/user/password/reset', config: User.resetPassword },
+    { method: 'DELETE', path: '/user/{id}', config: User.delete },
 
     // Tokens
 

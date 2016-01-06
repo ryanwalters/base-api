@@ -40,11 +40,17 @@ describe('/v1/user', () => {
 
     describe('POST - create user', () => {
 
+
+        // Reset the DB
+
         before((done) => {
             Models.sequelize.sync({ force: true }).then(() => {
                 done();
             });
         });
+
+
+        // Set route options
 
         let options;
 
@@ -58,6 +64,9 @@ describe('/v1/user', () => {
 
             done();
         });
+
+
+        // Tests
 
         it('fails user creation when required fields are missing', (done) => {
 

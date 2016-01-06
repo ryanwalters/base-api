@@ -78,8 +78,8 @@ describe('/v1/user', () => {
                 const result = res.result;
 
                 expect(res.statusCode).to.equal(200);
-                expect(result.statusCode).to.equal(Status.VALIDATION_ERROR.statusCode);
                 expect(result.message).to.equal(Status.VALIDATION_ERROR.message);
+                expect(result.statusCode).to.equal(Status.VALIDATION_ERROR.statusCode);
                 expect(result.data).to.be.empty();
                 expect(result.errorDetails).to.be.an.array();
                 expect(result.errorDetails).to.have.length(3);
@@ -102,6 +102,8 @@ describe('/v1/user', () => {
                 expect(result.statusCode).to.equal(Status.OK.statusCode);
                 expect(result.message).to.equal(Status.OK.message);
                 expect(result.data).to.be.an.object();
+
+                // todo: check safeFields vs hard coding fields
                 expect(result.data.username).to.equal(options.payload.username);
                 expect(result.data.email).to.equal(options.payload.email);
                 expect(result.data.displayName).to.equal(options.payload.displayName);
@@ -118,8 +120,8 @@ describe('/v1/user', () => {
                 const result = res.result;
 
                 expect(res.statusCode).to.equal(200);
-                expect(result.statusCode).to.equal(Status.ACCOUNT_CREATION_ERROR.statusCode);
                 expect(result.message).to.equal(Status.ACCOUNT_CREATION_ERROR.message);
+                expect(result.statusCode).to.equal(Status.ACCOUNT_CREATION_ERROR.statusCode);
                 expect(result.errorDetails).to.be.array();
                 expect(result.errorDetails).to.deep.include({ type: 'unique violation' });
                 expect(result.data).to.be.empty();
@@ -131,7 +133,7 @@ describe('/v1/user', () => {
 
     // Get user details
 
-    describe('GET /{userId} - user details', () => {
+    describe('GET /{id} - user details', () => {
 
 
         // Retrieve access tokens for normal and admin users
@@ -217,8 +219,8 @@ describe('/v1/user', () => {
                 const result = res.result;
 
                 expect(res.statusCode).to.equal(200);
-                expect(result.statusCode).to.equal(Status.OK.statusCode);
                 expect(result.message).to.equal(Status.OK.message);
+                expect(result.statusCode).to.equal(Status.OK.statusCode);
                 expect(result.data).to.deep.equal(_.omit(internals.user, 'password'));
                 done();
             });
@@ -245,8 +247,8 @@ describe('/v1/user', () => {
                 const result = res.result;
 
                 expect(res.statusCode).to.equal(200);
-                expect(result.statusCode).to.equal(Status.USER_NOT_FOUND.statusCode);
                 expect(result.message).to.equal(Status.USER_NOT_FOUND.message);
+                expect(result.statusCode).to.equal(Status.USER_NOT_FOUND.statusCode);
                 expect(result.data).to.be.empty();
                 done();
             });
@@ -256,8 +258,104 @@ describe('/v1/user', () => {
 
     // Update user
 
-    describe('PUT /{userId} - update user', () => {
+    describe('PUT /{id} - update user', () => {
 
 
+        // Set route options
+
+        let options;
+
+        beforeEach((done) => {
+
+            options = {
+                method: 'PUT',
+                url: '/v1/user/1',
+                headers: {
+                    authorization: internals.accessToken
+                },
+                payload: {}
+            };
+
+            done();
+        });
+
+
+        // Tests
+
+        it('fails without jwt', (done) => {
+
+            delete options.headers;
+
+            server.inject(options, (res) => {
+
+                expect(res.statusCode).to.equal(401);
+                done();
+            });
+        });
+
+        it('fails to update password', (done) => {
+
+            options.payload = {
+                password: '123456'
+            };
+
+            server.inject(options, (res) => {
+
+                const result = res.result;
+
+                expect(res.statusCode).to.equal(200);
+                expect(result.message).to.equal(Status.VALIDATION_ERROR.message);
+                expect(result.statusCode).to.equal(Status.VALIDATION_ERROR.statusCode);
+                expect(result.errorDetails).to.be.an.array();
+                expect(result.errorDetails).to.deep.include({ path: 'password' });
+                done();
+            });
+        });
+
+        it('successfully updates user', (done) => {
+
+            options.payload = _.chain(internals.user)
+                .omit('password')
+                .mapValues((value) => '2' + value)
+                .value();
+
+            server.inject(options, (res) => {
+
+                const result = res.result;
+
+                expect(res.statusCode).to.equal(200);
+                expect(result.message).to.equal(Status.OK.message);
+                expect(result.statusCode).to.equal(Status.OK.statusCode);
+                expect(result.data).to.be.an.object();
+                done();
+            });
+        });
+
+        it('fails when user has insufficient scope', (done) => {
+
+            options.url = '/v1/user/123';
+
+            server.inject(options, (res) => {
+
+                expect(res.statusCode).to.equal(403);
+                done();
+            });
+        });
+
+        it('fails when user does not exist', (done) => {
+
+            options.headers.authorization = internals.adminAccessToken;
+            options.url = '/v1/user/123';
+
+            server.inject(options, (res) => {
+
+                const result = res.result;
+
+                expect(res.statusCode).to.equal(200);
+                expect(result.message).to.equal(Status.USER_NOT_FOUND.message);
+                expect(result.statusCode).to.equal(Status.USER_NOT_FOUND.statusCode);
+                done();
+            });
+        });
     });
 });

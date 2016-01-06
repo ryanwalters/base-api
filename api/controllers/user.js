@@ -71,6 +71,8 @@ module.exports = {
 
     // Update user
 
+    // todo: figure out what to do with this. sqlite3 does not support RETURNING * (model.js ln2554)
+
     update: {
         auth: {
             access: {
@@ -82,8 +84,8 @@ module.exports = {
             UserModel.update(request.payload, {
                 where: {
                     id: request.params.id
-                },
-                returning: true
+                }/*,
+                returning: true*/
             })
                 .then((response) => {
 
@@ -91,7 +93,7 @@ module.exports = {
                         return reply(new WFResponse(Status.USER_NOT_FOUND));
                     }
 
-                    return reply(new WFResponse(Status.OK, response[1][0].getSafeFields()));
+                    return reply(new WFResponse(Status.OK/*, response[1][0].getSafeFields()*/));
                 })
                 .catch((error) => reply(new WFResponse(Status.SERVER_ERROR, null, error)));
         },
@@ -101,28 +103,6 @@ module.exports = {
                 email: Joi.string().email(),
                 displayName: Joi.string().min(3).max(30)
             }).options({ abortEarly: false })
-        }
-    },
-
-
-    // Delete user
-
-    delete: {
-        auth: {
-            access: {
-                scope: [Scopes.ADMIN, Scopes.USER_ID]
-            }
-        },
-        handler: (request, reply) => {
-
-            UserModel.destroy({
-                where: {
-                    id: request.auth.credentials.sub
-                },
-                limit: 1
-            })
-                .then((rowsAffected) => reply(new WFResponse(Status.OK, { rowsAffected: rowsAffected })))
-                .catch((error) => reply(new WFResponse(Status.SERVER_ERROR, null, error)));
         }
     },
 
@@ -259,6 +239,28 @@ module.exports = {
             payload: {
                 userId: Joi.number().required()
             }
+        }
+    },
+
+
+    // Delete user
+
+    delete: {
+        auth: {
+            access: {
+                scope: [Scopes.ADMIN, Scopes.USER_ID]
+            }
+        },
+        handler: (request, reply) => {
+
+            UserModel.destroy({
+                where: {
+                    id: request.auth.credentials.sub
+                },
+                limit: 1
+            })
+                .then((rowsAffected) => reply(new WFResponse(Status.OK, { rowsAffected: rowsAffected })))
+                .catch((error) => reply(new WFResponse(Status.SERVER_ERROR, null, error)));
         }
     }
 };

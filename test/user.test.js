@@ -27,7 +27,10 @@ const internals = {
         password: '123456',
         email: 'test@weddingfoundry.com',
         displayName: 'John Doe'
-    }
+    },
+    accessToken: null,
+    adminAccessToken: null,
+    refreshToken: null
 };
 
 
@@ -98,6 +101,7 @@ describe('/v1/user', () => {
                 expect(res.statusCode).to.equal(200);
                 expect(result.statusCode).to.equal(Status.OK.statusCode);
                 expect(result.message).to.equal(Status.OK.message);
+                expect(result.data).to.be.an.object();
                 expect(result.data.username).to.equal(options.payload.username);
                 expect(result.data.email).to.equal(options.payload.email);
                 expect(result.data.displayName).to.equal(options.payload.displayName);
@@ -132,12 +136,7 @@ describe('/v1/user', () => {
 
         // Retrieve access tokens for normal and admin users
 
-        let accessToken;
-        let adminAccessToken;
-
         before((done) => {
-
-            let refreshToken;
 
 
             // Get refresh token
@@ -146,16 +145,16 @@ describe('/v1/user', () => {
                 payload: _.pick(internals.user, ['email', 'password'])
             }, (res) => {
 
-                refreshToken = res.result.refreshToken;
+                internals.refreshToken = res.result.refreshToken;
 
 
                 // Get normal access token
 
                 server.inject({ method: 'POST', url: '/v1/token/access',
-                    headers: { authorization: refreshToken }
+                    headers: { authorization: internals.refreshToken }
                 }, (res) => {
 
-                    accessToken = res.result.accessToken;
+                    internals.accessToken = res.result.accessToken;
 
 
                     // Make user an admin and get the admin access token
@@ -168,10 +167,10 @@ describe('/v1/user', () => {
                         .then(() => {
 
                             server.inject({ method: 'POST', url: '/v1/token/access',
-                                headers: { authorization: refreshToken }
+                                headers: { authorization: internals.refreshToken }
                             }, (res) => {
 
-                                adminAccessToken = res.result.accessToken;
+                                internals.adminAccessToken = res.result.accessToken;
                                 done();
                             });
                         });
@@ -190,7 +189,7 @@ describe('/v1/user', () => {
                 method: 'GET',
                 url: '/v1/user/1',
                 headers: {
-                    authorization: accessToken
+                    authorization: internals.accessToken
                 }
             };
 
@@ -238,7 +237,7 @@ describe('/v1/user', () => {
 
         it('fails when user does not exist', (done) => {
 
-            options.headers.authorization = adminAccessToken;
+            options.headers.authorization = internals.adminAccessToken;
             options.url = '/v1/user/123';
 
             server.inject(options, (res) => {
@@ -252,5 +251,13 @@ describe('/v1/user', () => {
                 done();
             });
         });
+    });
+
+
+    // Update user
+
+    describe('PUT /{userId} - update user', () => {
+
+
     });
 });

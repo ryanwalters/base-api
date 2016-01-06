@@ -358,4 +358,81 @@ describe('/v1/user', () => {
             });
         });
     });
+
+
+    // Update password
+
+    describe('POST /{id}/password/update', () => {
+
+
+        // Set route options
+
+        let options;
+
+        beforeEach((done) => {
+
+            options = {
+                method: 'POST',
+                url: '/v1/user/1/password/update',
+                headers: {
+                    authorization: internals.accessToken
+                },
+                payload: {
+                    newPassword: '1234567',
+                    confirmPassword: '1234567',
+                    password: internals.user.password
+                }
+            };
+
+            done();
+        });
+
+
+        // Tests
+
+        it('fails without jwt', (done) => {
+
+            delete options.headers;
+
+            server.inject(options, (res) => {
+
+                expect(res.statusCode).to.equal(401);
+                done();
+            });
+        });
+
+        it('fails with invalid payload', (done) => {
+
+            options.payload = {};
+
+            server.inject(options, (res) => {
+
+                const result = res.result;
+
+                expect(res.statusCode).to.equal(200);
+                expect(result.message).to.equal(Status.VALIDATION_ERROR.message);
+                expect(result.statusCode).to.equal(Status.VALIDATION_ERROR.statusCode);
+                expect(result.errorDetails).to.be.an.array();
+                expect(result.errorDetails).to.have.length(3);
+                expect(result.errorDetails).to.deep.include({ path: 'newPassword' });
+                expect(result.errorDetails).to.deep.include({ path: 'confirmPassword' });
+                expect(result.errorDetails).to.deep.include({ path: 'password' });
+                done();
+            });
+        });
+
+        it('successfully updates password', (done) => {
+
+            server.inject(options, (res) => {
+
+                const result = res.result;
+
+                expect(res.statusCode).to.equal(200);
+                expect(result.message).to.equal(Status.OK.message);
+                expect(result.statusCode).to.equal(Status.OK.statusCode);
+                expect(result.data).to.deep.equal({ rowsAffected: 1 });
+                done();
+            });
+        });
+    });
 });

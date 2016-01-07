@@ -43,7 +43,7 @@ server.register(require('jot'), (err) => {
             .then((user) => {
 
                 if (!user) {
-                    return callback('No user found.', false);
+                    return callback('No user found', false);
                 }
 
                 if (user.admin) {

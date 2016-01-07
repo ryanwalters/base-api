@@ -246,11 +246,18 @@ module.exports = {
 
             UserModel.destroy({
                 where: {
-                    id: request.auth.credentials.sub
+                    id: request.params.id
                 },
                 limit: 1
             })
-                .then((rowsAffected) => reply(new WFResponse(Status.OK)))
+                .then((rowsAffected) => {
+
+                    if (rowsAffected === 0) {
+                        return reply(new WFResponse(Status.USER_NOT_FOUND));
+                    }
+
+                    return reply(new WFResponse(Status.OK));
+                })
                 .catch((error) => reply(new WFResponse(Status.SERVER_ERROR, null, error)));
         }
     }

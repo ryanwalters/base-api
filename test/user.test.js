@@ -370,7 +370,7 @@ describe('/v1/user', () => {
 
     // Update password
 
-    describe('POST /{id}/password/update', () => {
+    describe('POST /{id}/password/update - update password', () => {
 
 
         // Set route options
@@ -535,7 +535,7 @@ describe('/v1/user', () => {
 
     // Reset password
 
-    describe('POST /password/reset', () => {
+    describe('POST /password/reset - reset password', () => {
 
 
         // Set route options
@@ -621,6 +621,88 @@ describe('/v1/user', () => {
         });
 
         it('successfully resets password', (done) => {
+
+            server.inject(options, (res) => {
+
+                const result = res.result;
+
+                expect(res.statusCode).to.equal(200);
+                expect(result.message).to.equal(Status.OK.message);
+                expect(result.statusCode).to.equal(Status.OK.statusCode);
+                expect(result.data).to.be.an.object();
+                expect(result.data).to.be.empty();
+                done();
+            });
+        });
+    });
+
+
+    // Delete user
+
+    describe('DELETE', () => {
+
+
+        // Set route options
+
+        let options;
+
+        beforeEach((done) => {
+
+            options = {
+                method: 'DELETE',
+                url: '/v1/user/1',
+                headers: {
+                    authorization: internals.adminAccessToken
+                }
+            };
+
+            done();
+        });
+
+
+        // Tests
+
+        it('fails without jwt', (done) => {
+
+            delete options.headers;
+
+            server.inject(options, (res) => {
+
+                expect(res.statusCode).to.equal(401);
+                done();
+            });
+        });
+
+        it('fails when user has insufficient scope', (done) => {
+
+            options.headers.authorization = internals.accessToken;
+            options.url = '/v1/user/123';
+
+            server.inject(options, (res) => {
+
+                expect(res.statusCode).to.equal(403);
+                done();
+            });
+        });
+
+        it('fails when user does not exist', (done) => {
+
+            options.url = '/v1/user/123';
+
+            server.inject(options, (res) => {
+
+                const result = res.result;
+
+                expect(res.statusCode).to.equal(200);
+                expect(result.message).to.equal(Status.USER_NOT_FOUND.message);
+                expect(result.statusCode).to.equal(Status.USER_NOT_FOUND.statusCode);
+                expect(result.data).to.be.an.object();
+                expect(result.data).to.be.empty();
+                done();
+            });
+        });
+
+        it('successfully deletes user', (done) => {
 
             server.inject(options, (res) => {
 

@@ -25,7 +25,7 @@ const internals = {
     user: {
         username: 'test',
         password: '123456',
-        email: 'test@weddingfoundry.com',
+        email: 'test@test.com',
         displayName: 'John Doe'
     },
     accessToken: null,
@@ -149,7 +149,7 @@ describe('/v1/user', () => {
                 payload: _.pick(internals.user, ['email', 'password'])
             }, (res) => {
 
-                internals.refreshToken = res.result.refreshToken;
+                internals.refreshToken = res.result.data.refreshToken;
 
 
                 // Get normal access token
@@ -158,7 +158,7 @@ describe('/v1/user', () => {
                     headers: { authorization: internals.refreshToken }
                 }, (res) => {
 
-                    internals.accessToken = res.result.accessToken;
+                    internals.accessToken = res.result.data.accessToken;
 
 
                     // Make user an admin and get the admin access token
@@ -174,7 +174,7 @@ describe('/v1/user', () => {
                                 headers: { authorization: internals.refreshToken }
                             }, (res) => {
 
-                                internals.adminAccessToken = res.result.accessToken;
+                                internals.adminAccessToken = res.result.data.accessToken;
                                 done();
                             });
                         });

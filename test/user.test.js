@@ -39,18 +39,18 @@ const internals = {
 describe('/v1/user', () => {
 
 
+    // Reset the DB
+
+    before((done) => {
+        Models.sequelize.sync({ force: true }).then(() => {
+            done();
+        });
+    });
+
+
     // Create user
 
     describe('POST - create user', () => {
-
-
-        // Reset the DB
-
-        before((done) => {
-            Models.sequelize.sync({ force: true }).then(() => {
-                done();
-            });
-        });
 
 
         // Set route options

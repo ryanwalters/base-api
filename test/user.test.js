@@ -639,7 +639,7 @@ describe('/v1/user', () => {
 
     // Delete user
 
-    describe('DELETE', () => {
+    describe('DELETE /{id} - delete user', () => {
 
 
         // Set route options

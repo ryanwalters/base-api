@@ -15,18 +15,27 @@ module.exports = {
     // Status codes
 
     Status: Object.freeze({
+
         OK: {
             statusCode: 0,
             message: 'Ok'
         },
+
+
+        // Unauthorized
+
         UNAUTHORIZED: {
-            statusCode: 40000,
+            statusCode: 40100,
             message: 'Unauthorized'
         },
         VALIDATION_ERROR: {
-            statusCode: 40001,
+            statusCode: 40101,
             message: 'Validation error'
         },
+
+
+        // Forbidden
+
         FORBIDDEN: {
             statusCode: 40300,
             message: 'Forbidden'
@@ -35,14 +44,18 @@ module.exports = {
             statusCode: 40301,
             message: 'Account creation error'
         },
-        USER_NOT_FOUND: {
-            statusCode: 40302,
-            message: 'User not found'
-        },
         PASSWORD_INCORRECT: {
-            statusCode: 40303,
+            statusCode: 40302,
             message: 'Password incorrect'
         },
+        USER_NOT_FOUND: {
+            statusCode: 40303,
+            message: 'User not found'
+        },
+
+
+        // Server error
+
         SERVER_ERROR: {
             statusCode: 50000,
             message: 'Server error'

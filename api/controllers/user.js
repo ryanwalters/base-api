@@ -128,7 +128,7 @@ module.exports = {
 
             UserModel.findOne({
                 where: {
-                    id: request.auth.credentials.sub
+                    id: request.params.id
                 }
             })
                 .then((user) => {
@@ -141,25 +141,16 @@ module.exports = {
                         return reply(new WFResponse(Status.PASSWORD_INCORRECT));
                     }
 
-                    if (request.payload.password === request.payload.newPassword) {
-                        return reply(new WFResponse(Status.OLD_PASSWORD));
-                    }
-
-                    user.salt = Uuid.v1();
-                    user.password = UserModel.hashPassword(request.payload.newPassword, user.salt);
+                    user.dataValues.salt = Uuid.v1();
+                    user.dataValues.password = UserModel.hashPassword(request.payload.newPassword, user.salt);
 
                     UserModel.update(user.dataValues, {
                         where: {
                             id: user.id
                         }
                     })
-                        .then((response) => reply(new WFResponse(Status.OK, { rowsAffected: response[0] })))
-                        .catch((error) => {
-
-                            console.error(error);
-
-                            return reply(new WFResponse(Status.SERVER_ERROR));
-                        });
+                        .then((response) => reply(new WFResponse(Status.OK)))
+                        .catch((error) => reply(new WFResponse(Status.SERVER_ERROR, null, error)));
 
                     return null; // Stops bluebird from complaining...
                 })
@@ -167,18 +158,18 @@ module.exports = {
         },
         validate: {
             payload: Joi.object({
-                newPassword: Joi.string().min(6).required(),
-                confirmPassword: Joi.string().required().valid(Joi.ref('newPassword')).options({
+                password: Joi.string().min(6).required(),
+                newPassword: Joi.string().min(6).required().invalid(Joi.ref('password')).options({
                     language: {
                         any: {
-                            allowOnly: '!!new passwords must match'
+                            invalid: 'cannot match "password"'
                         }
                     }
                 }),
-                password: Joi.string().min(6).required().invalid(Joi.ref('newPassword')).options({
+                confirmPassword: Joi.string().required().valid(Joi.ref('newPassword')).options({
                     language: {
                         any: {
-                            invalid: '!!new password cannot match your current password'
+                            allowOnly: 'must match "newPassword"'
                         }
                     }
                 })

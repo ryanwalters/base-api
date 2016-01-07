@@ -27,14 +27,6 @@ module.exports = {
             statusCode: 40001,
             message: 'Validation error'
         },
-        OLD_PASSWORD: {
-            statusCode: 40101,
-            message: 'Old password used'
-        },
-        PASSWORD_INCORRECT: {
-            statusCode: 40102,
-            message: 'Password incorrect'
-        },
         FORBIDDEN: {
             statusCode: 40300,
             message: 'Forbidden'
@@ -46,6 +38,10 @@ module.exports = {
         USER_NOT_FOUND: {
             statusCode: 40302,
             message: 'User not found'
+        },
+        PASSWORD_INCORRECT: {
+            statusCode: 40303,
+            message: 'Password incorrect'
         },
         SERVER_ERROR: {
             statusCode: 50000,

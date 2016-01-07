@@ -80,12 +80,13 @@ describe('/v1/user', () => {
                 expect(res.statusCode).to.equal(200);
                 expect(result.message).to.equal(Status.VALIDATION_ERROR.message);
                 expect(result.statusCode).to.equal(Status.VALIDATION_ERROR.statusCode);
-                expect(result.data).to.be.empty();
                 expect(result.errorDetails).to.be.an.array();
                 expect(result.errorDetails).to.have.length(3);
                 expect(result.errorDetails).to.deep.include({ path: 'username' });
                 expect(result.errorDetails).to.deep.include({ path: 'password' });
                 expect(result.errorDetails).to.deep.include({ path: 'email' });
+                expect(result.data).to.be.an.object();
+                expect(result.data).to.be.empty();
                 done();
             });
         });
@@ -111,7 +112,7 @@ describe('/v1/user', () => {
             });
         });
 
-        it('fails when user exists', (done) => {
+        it('fails when user already exists', (done) => {
 
             options.payload = internals.user;
 
@@ -124,6 +125,7 @@ describe('/v1/user', () => {
                 expect(result.statusCode).to.equal(Status.ACCOUNT_CREATION_ERROR.statusCode);
                 expect(result.errorDetails).to.be.array();
                 expect(result.errorDetails).to.deep.include({ type: 'unique violation' });
+                expect(result.data).to.be.an.object();
                 expect(result.data).to.be.empty();
                 done();
             });
@@ -249,6 +251,7 @@ describe('/v1/user', () => {
                 expect(res.statusCode).to.equal(200);
                 expect(result.message).to.equal(Status.USER_NOT_FOUND.message);
                 expect(result.statusCode).to.equal(Status.USER_NOT_FOUND.statusCode);
+                expect(result.data).to.be.an.object();
                 expect(result.data).to.be.empty();
                 done();
             });
@@ -308,6 +311,8 @@ describe('/v1/user', () => {
                 expect(result.statusCode).to.equal(Status.VALIDATION_ERROR.statusCode);
                 expect(result.errorDetails).to.be.an.array();
                 expect(result.errorDetails).to.deep.include({ path: 'password' });
+                expect(result.data).to.be.an.object();
+                expect(result.data).to.be.empty();
                 done();
             });
         });
@@ -327,6 +332,7 @@ describe('/v1/user', () => {
                 expect(result.message).to.equal(Status.OK.message);
                 expect(result.statusCode).to.equal(Status.OK.statusCode);
                 expect(result.data).to.be.an.object();
+                expect(result.data).to.be.empty();
                 done();
             });
         });
@@ -354,6 +360,8 @@ describe('/v1/user', () => {
                 expect(res.statusCode).to.equal(200);
                 expect(result.message).to.equal(Status.USER_NOT_FOUND.message);
                 expect(result.statusCode).to.equal(Status.USER_NOT_FOUND.statusCode);
+                expect(result.data).to.be.an.object();
+                expect(result.data).to.be.empty();
                 done();
             });
         });
@@ -417,6 +425,93 @@ describe('/v1/user', () => {
                 expect(result.errorDetails).to.deep.include({ path: 'newPassword' });
                 expect(result.errorDetails).to.deep.include({ path: 'confirmPassword' });
                 expect(result.errorDetails).to.deep.include({ path: 'password' });
+                expect(result.data).to.be.an.object();
+                expect(result.data).to.be.empty();
+                done();
+            });
+        });
+
+        it('fails when user has insufficient scope', (done) => {
+
+            options.url = '/v1/user/123/password/update';
+
+            server.inject(options, (res) => {
+
+                expect(res.statusCode).to.equal(403);
+                done();
+            });
+        });
+
+        it('fails when user does not exist', (done) => {
+
+            options.headers.authorization = internals.adminAccessToken;
+            options.url = '/v1/user/123/password/update';
+
+            server.inject(options, (res) => {
+
+                const result = res.result;
+
+                expect(res.statusCode).to.equal(200);
+                expect(result.message).to.equal(Status.USER_NOT_FOUND.message);
+                expect(result.statusCode).to.equal(Status.USER_NOT_FOUND.statusCode);
+                expect(result.data).to.be.an.object();
+                expect(result.data).to.be.empty();
+                done();
+            });
+        });
+
+        it('fails when new password does not match confirm password', (done) => {
+
+            options.payload.confirmPassword = 'wrong password';
+
+            server.inject(options, (res) => {
+
+                const result = res.result;
+
+                expect(res.statusCode).to.equal(200);
+                expect(result.message).to.equal(Status.VALIDATION_ERROR.message);
+                expect(result.statusCode).to.equal(Status.VALIDATION_ERROR.statusCode);
+                expect(result.errorDetails).to.be.an.array();
+                expect(result.errorDetails).to.deep.include({ path: 'confirmPassword' });
+                expect(result.data).to.be.an.object();
+                expect(result.data).to.be.empty();
+                done();
+            });
+        });
+
+        it('fails when user enters old password as new password', (done) => {
+
+            options.payload.newPassword = options.payload.password;
+            options.payload.confirmPassword = options.payload.password;
+
+            server.inject(options, (res) => {
+
+                const result = res.result;
+
+                expect(res.statusCode).to.equal(200);
+                expect(result.message).to.equal(Status.VALIDATION_ERROR.message);
+                expect(result.statusCode).to.equal(Status.VALIDATION_ERROR.statusCode);
+                expect(result.errorDetails).to.be.an.array();
+                expect(result.errorDetails).to.deep.include({ path: 'newPassword' });
+                expect(result.data).to.be.an.object();
+                expect(result.data).to.be.empty();
+                done();
+            });
+        });
+
+        it('fails when user enters incorrect password', (done) => {
+
+            options.payload.password = 'wrong password';
+
+            server.inject(options, (res) => {
+
+                const result = res.result;
+
+                expect(res.statusCode).to.equal(200);
+                expect(result.message).to.equal(Status.PASSWORD_INCORRECT.message);
+                expect(result.statusCode).to.equal(Status.PASSWORD_INCORRECT.statusCode);
+                expect(result.data).to.be.an.object();
+                expect(result.data).to.be.empty();
                 done();
             });
         });
@@ -430,7 +525,8 @@ describe('/v1/user', () => {
                 expect(res.statusCode).to.equal(200);
                 expect(result.message).to.equal(Status.OK.message);
                 expect(result.statusCode).to.equal(Status.OK.statusCode);
-                expect(result.data).to.deep.equal({ rowsAffected: 1 });
+                expect(result.data).to.be.an.object();
+                expect(result.data).to.be.empty();
                 done();
             });
         });

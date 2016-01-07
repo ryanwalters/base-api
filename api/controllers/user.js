@@ -206,19 +206,19 @@ module.exports = {
                     const password = Randomstring.generate();
                     const salt = Uuid.v1();
 
-                    user.password = UserModel.hashPassword(password, salt);
-                    user.salt = salt;
+                    user.dataValues.password = UserModel.hashPassword(password, salt);
+                    user.dataValues.salt = salt;
 
                     UserModel.update(user.dataValues, {
                         where: {
                             id: user.id
                         }
                     })
-                        .then((response) => {
+                        .then(() => {
 
                             // todo: email user with password
 
-                            return reply(new WFResponse(Status.OK, { rowsAffected: response[0] }));
+                            return reply(new WFResponse(Status.OK));
                         })
                         .catch((error) => reply(new WFResponse(Status.SERVER_ERROR, null, error)));
 
@@ -250,7 +250,7 @@ module.exports = {
                 },
                 limit: 1
             })
-                .then((rowsAffected) => reply(new WFResponse(Status.OK, { rowsAffected: rowsAffected })))
+                .then((rowsAffected) => reply(new WFResponse(Status.OK)))
                 .catch((error) => reply(new WFResponse(Status.SERVER_ERROR, null, error)));
         }
     }

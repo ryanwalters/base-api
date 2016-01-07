@@ -531,4 +531,108 @@ describe('/v1/user', () => {
             });
         });
     });
+
+
+    // Reset password
+
+    describe('POST /password/reset', () => {
+
+
+        // Set route options
+
+        let options;
+
+        beforeEach((done) => {
+
+            options = {
+                method: 'POST',
+                url: '/v1/user/password/reset',
+                headers: {
+                    authorization: internals.adminAccessToken
+                },
+                payload: {
+                    userId: 1
+                }
+            };
+
+            done();
+        });
+
+
+        // Tests
+
+        it('fails without jwt', (done) => {
+
+            delete options.headers;
+
+            server.inject(options, (res) => {
+
+                expect(res.statusCode).to.equal(401);
+                done();
+            });
+        });
+
+        it('fails with invalid payload', (done) => {
+
+            options.payload = {};
+
+            server.inject(options, (res) => {
+
+                const result = res.result;
+
+                expect(res.statusCode).to.equal(200);
+                expect(result.message).to.equal(Status.VALIDATION_ERROR.message);
+                expect(result.statusCode).to.equal(Status.VALIDATION_ERROR.statusCode);
+                expect(result.errorDetails).to.be.an.array();
+                expect(result.errorDetails).to.have.length(1);
+                expect(result.errorDetails).to.deep.include({ path: 'userId' });
+                expect(result.data).to.be.an.object();
+                expect(result.data).to.be.empty();
+                done();
+            });
+        });
+
+        it('fails when user has insufficient scope', (done) => {
+
+            options.headers.authorization = internals.accessToken;
+
+            server.inject(options, (res) => {
+
+                expect(res.statusCode).to.equal(403);
+                done();
+            });
+        });
+
+        it('fails when user does not exist', (done) => {
+
+            options.payload.userId = '123';
+
+            server.inject(options, (res) => {
+
+                const result = res.result;
+
+                expect(res.statusCode).to.equal(200);
+                expect(result.message).to.equal(Status.USER_NOT_FOUND.message);
+                expect(result.statusCode).to.equal(Status.USER_NOT_FOUND.statusCode);
+                expect(result.data).to.be.an.object();
+                expect(result.data).to.be.empty();
+                done();
+            });
+        });
+
+        it('successfully resets password', (done) => {
+
+            server.inject(options, (res) => {
+
+                const result = res.result;
+
+                expect(res.statusCode).to.equal(200);
+                expect(result.message).to.equal(Status.OK.message);
+                expect(result.statusCode).to.equal(Status.OK.statusCode);
+                expect(result.data).to.be.an.object();
+                expect(result.data).to.be.empty();
+                done();
+            });
+        });
+    });
 });

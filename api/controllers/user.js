@@ -149,7 +149,7 @@ module.exports = {
                             id: user.id
                         }
                     })
-                        .then((response) => reply(new WFResponse(Status.OK)))
+                        .then(() => reply(new WFResponse(Status.OK)))
                         .catch((error) => reply(new WFResponse(Status.SERVER_ERROR, null, error)));
 
                     return null; // Stops bluebird from complaining...

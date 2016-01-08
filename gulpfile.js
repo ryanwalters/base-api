@@ -7,10 +7,11 @@ const eslint = require('gulp-eslint');
 // Tasks
 
 gulp.task('lint', () => {
+    
     gulp.src([
         './*.js',
         './api/**/*.js',
-        './config/**/*.js'
+        './test/*.js'
     ])
         .pipe(eslint())
         .pipe(eslint.format())

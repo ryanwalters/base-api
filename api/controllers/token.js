@@ -73,12 +73,13 @@ module.exports = {
                 .catch((error) => reply(new WFResponse(Status.SERVER_ERROR, null, error)));
         },
         validate: {
-            payload: {
+            payload: Joi.object({
                 email: Joi.string().email().required(),
                 password: Joi.string().required()
-            }
+            }).options({ abortEarly: false })
         }
     },
+
 
     // Generate access token from a refresh token
 

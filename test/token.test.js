@@ -83,6 +83,27 @@ describe('/v1/token', () => {
 
         // Tests
 
+        it('fails with invalid payload', (done) => {
+
+            options.payload = {};
+
+            server.inject(options, (res) => {
+
+                const result = res.result;
+
+                expect(res.statusCode).to.equal(200);
+                expect(result.message).to.equal(Status.VALIDATION_ERROR.message);
+                expect(result.statusCode).to.equal(Status.VALIDATION_ERROR.statusCode);
+                expect(result.errorDetails).to.be.an.array();
+                expect(result.errorDetails).to.have.length(2);
+                expect(result.errorDetails).to.deep.include({ path: 'email' });
+                expect(result.errorDetails).to.deep.include({ path: 'password' });
+                expect(result.data).to.be.an.object();
+                expect(result.data).to.be.empty();
+                done();
+            });
+        });
+
         it('fails when user does not exist', (done) => {
 
             options.payload.email = 'bad@email.com';

@@ -16,7 +16,7 @@ server.connection(Config.get('/connection'));
 
 // Authentication strategies
 
-server.register(require('../../jot'), (err) => {
+server.register(require('jot'), (err) => {
 
     Hoek.assert(!err, err);
 

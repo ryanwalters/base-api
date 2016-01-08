@@ -43,6 +43,10 @@ const config = {
             cors: {
                 origin: ['.weddingfoundry.com']
             }
+        },
+        uri: {
+            $filter: 'env',
+            production: 'https://api.weddingfoundry.com'
         }
     },
     db: {

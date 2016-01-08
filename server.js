@@ -75,20 +75,17 @@ server.register(require('./api/routes'), {
     routes: {
         prefix: Config.get('/api/version')
     }
-}, (err) => {
-
-    Hoek.assert(!err, err);
+}, (err) => Hoek.assert(!err, err));
 
 
-    // Default, unprefixed route; todo: make these the docs (lout?)
+// Documentation
 
-    server.route({ method: 'GET', path: '/',
-        config: {
-            auth: false,
-            handler: (request, reply) => reply('hello!')
-        }
-    });
-});
+server.register([require('vision'), require('inert'), {
+    register: require('lout'),
+    options: {
+        endpoint: '/'
+    }
+}], (err) => Hoek.assert(!err, err));
 
 
 // Format validation and jwt errors
@@ -96,6 +93,9 @@ server.register(require('./api/routes'), {
 server.ext('onPreResponse', (request, reply) => {
 
     const response = request.response;
+
+
+    // Validation errors
 
     if (response.isBoom && response.data && response.data.name === 'ValidationError') {
 
@@ -105,6 +105,9 @@ server.ext('onPreResponse', (request, reply) => {
 
         return reply(new WFResponse(Status.VALIDATION_ERROR, null, details));
     }
+
+
+    // JWT errors
 
     if (response.isBoom && response.isJot) {
 

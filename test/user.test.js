@@ -104,10 +104,10 @@ describe('/v1/user', () => {
                 expect(result.message).to.equal(Status.OK.message);
                 expect(result.data).to.be.an.object();
 
-                // todo: check safeFields vs hard coding fields
-                expect(result.data.username).to.equal(options.payload.username);
-                expect(result.data.email).to.equal(options.payload.email);
-                expect(result.data.displayName).to.equal(options.payload.displayName);
+                Models.User.safeFields.forEach((field) => {
+                    expect(result.data[field]).to.equal(options.payload[field]);
+                });
+
                 done();
             });
         });
@@ -223,7 +223,7 @@ describe('/v1/user', () => {
                 expect(res.statusCode).to.equal(200);
                 expect(result.message).to.equal(Status.OK.message);
                 expect(result.statusCode).to.equal(Status.OK.statusCode);
-                expect(result.data).to.deep.equal(_.omit(internals.user, 'password'));
+                expect(Models.User.safeFields.every(_.partial(_.has, result.data))).to.equal(true);
                 done();
             });
         });

@@ -32,6 +32,10 @@ module.exports = {
             statusCode: 40101,
             message: 'Validation error'
         },
+        INVALID_TOKEN: {
+            statusCode: 40102,
+            message: 'Invalid token'
+        },
 
 
         // Forbidden

@@ -16,7 +16,7 @@ server.connection(Config.get('/connection'));
 
 // Authentication strategies
 
-server.register(require('jot'), (err) => {
+server.register(require('../../jot'), (err) => {
 
     Hoek.assert(!err, err);
 
@@ -43,7 +43,7 @@ server.register(require('jot'), (err) => {
             .then((user) => {
 
                 if (!user) {
-                    return callback('No user found', false);
+                    return callback(Status.USER_NOT_FOUND, false);
                 }
 
                 if (user.admin) {
@@ -54,7 +54,7 @@ server.register(require('jot'), (err) => {
                     return callback(null, true, token);
                 }
 
-                return callback(null, false);
+                return callback(Status.INVALID_TOKEN, false);
             })
             .catch((error) => callback(error.message, false));
     };
@@ -91,7 +91,7 @@ server.register(require('./api/routes'), {
 });
 
 
-// Format Boom validation errors
+// Format validation and jwt errors
 
 server.ext('onPreResponse', (request, reply) => {
 
@@ -104,6 +104,20 @@ server.ext('onPreResponse', (request, reply) => {
         response.data.details.forEach((detail) => details.push(_.pick(detail, ['message', 'path'])));
 
         return reply(new WFResponse(Status.VALIDATION_ERROR, null, details));
+    }
+
+    if (response.isBoom && response.isJot) {
+
+        switch (response.output.payload.message) {
+
+            case Status.USER_NOT_FOUND:
+
+                return reply(new WFResponse(Status.USER_NOT_FOUND));
+
+            case Status.INVALID_TOKEN:
+
+                return reply(new WFResponse(Status.INVALID_TOKEN));
+        }
     }
 
     return reply.continue();

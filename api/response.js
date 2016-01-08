@@ -12,7 +12,7 @@ module.exports = class WFResponse {
 
         const codeNumber = parseInt(status.statusCode, 10);
 
-        Hoek.assert(!Number.isNaN(codeNumber), `First argument must be a number: ${codeNumber}`);
+        Hoek.assert(!Number.isNaN(codeNumber), `First argument must be a Status object: ${codeNumber}`);
         Hoek.assert(status === Object(status), 'First argument is invalid');
 
         this.data = data || {};

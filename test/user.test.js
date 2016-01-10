@@ -136,7 +136,7 @@ describe('/v1/user', () => {
 
         it('successfully creates user w/out returning tokens', (done) => {
 
-            options.payload = _.transform(internals.user, (result, value, key) => result[key] = value + '2');
+            options.payload = _.mapValues(internals.user, (value) => value + '2');
             options.payload.returnToken = false;
 
             server.inject(options, (res) => {

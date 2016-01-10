@@ -100,13 +100,16 @@ describe('/v1/user', () => {
                 const result = res.result;
 
                 expect(res.statusCode).to.equal(200);
-                expect(result.statusCode).to.equal(Status.OK.statusCode);
                 expect(result.message).to.equal(Status.OK.message);
+                expect(result.statusCode).to.equal(Status.OK.statusCode);
                 expect(result.data).to.be.an.object();
 
                 Models.User.safeFields.forEach((field) => {
-                    expect(result.data[field]).to.equal(options.payload[field]);
+                    expect(result.data.user[field]).to.equal(options.payload[field]);
                 });
+
+                expect(result.data.accessToken).to.exist();
+                expect(result.data.refreshToken).to.exist();
 
                 done();
             });
@@ -127,6 +130,31 @@ describe('/v1/user', () => {
                 expect(result.errorDetails).to.deep.include({ type: 'unique violation' });
                 expect(result.data).to.be.an.object();
                 expect(result.data).to.be.empty();
+                done();
+            });
+        });
+
+        it('successfully creates user w/out returning tokens', (done) => {
+
+            options.payload = _.transform(internals.user, (result, value, key) => result[key] = value + '2');
+            options.payload.returnToken = false;
+
+            server.inject(options, (res) => {
+
+                const result = res.result;
+
+                expect(res.statusCode).to.equal(200);
+                expect(result.message).to.equal(Status.OK.message);
+                expect(result.statusCode).to.equal(Status.OK.statusCode);
+                expect(result.data).to.be.an.object();
+
+                Models.User.safeFields.forEach((field) => {
+                    expect(result.data.user[field]).to.equal(options.payload[field]);
+                });
+
+                expect(result.data.accessToken).to.not.exist();
+                expect(result.data.refreshToken).to.not.exist();
+
                 done();
             });
         });

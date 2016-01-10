@@ -20,13 +20,48 @@ module.exports = {
         auth: false,
         handler: (request, reply) => {
 
+            const password = request.payload.password;
             const salt = Uuid.v1();
 
-            request.payload.password = UserModel.hashPassword(request.payload.password, salt);
+            request.payload.password = UserModel.hashPassword(password, salt);
             request.payload.salt = salt;
 
             UserModel.create(request.payload)
-                .then((user) => reply(new WFResponse(Status.OK, user.getSafeFields())))
+                .then((user) => {
+
+                    const data = {
+                        user: user.getSafeFields()
+                    };
+
+                    if (!request.payload.returnToken) {
+                        return reply(new WFResponse(Status.OK, data));
+                    }
+
+                    request.server.inject({
+                        method: 'POST',
+                        url: '/v1/token/refresh',
+                        payload: {
+                            email: request.payload.email,
+                            password: password
+                        }
+                    }, (res) => {
+
+                        data.refreshToken = res.result.data.refreshToken;
+
+                        request.server.inject({
+                            method: 'POST',
+                            url: '/v1/token/access',
+                            headers: {
+                                authorization: data.refreshToken
+                            }
+                        }, (res) => {
+
+                            data.accessToken = res.result.data.accessToken;
+
+                            return reply(new WFResponse(Status.OK, data));
+                        });
+                    });
+                })
                 .catch((error) => reply(new WFResponse(Status.ACCOUNT_CREATION_ERROR, null, error.errors)));
         },
         validate: {
@@ -34,7 +69,8 @@ module.exports = {
                 username: Joi.string().alphanum().min(3).max(30).required(),
                 email: Joi.string().email().required(),
                 password: Joi.string().min(6).required(),
-                displayName: Joi.string().min(3).max(30)
+                displayName: Joi.string().min(3).max(30),
+                returnToken: Joi.boolean().default(true)
             }).options({ abortEarly: false })
         }
     },

@@ -65,7 +65,7 @@ const config = {
         },
         url: {
             $filter: 'env',
-            test: Path.join('sqlite://', __dirname, '../test/database.sqlite'),
+            test: Path.join('sqlite://', __dirname, '/database.sqlite'),
             $default: process.env.DATABASE_URL
         }
     },

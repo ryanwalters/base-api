@@ -4,7 +4,8 @@
   "description": "Basic account creation and management API",
   "main": "server.js",
   "scripts": {
-    "test": "lab -a code -t 100 -L -v"
+    "test": "lab -a code -t 100 -L -v",
+    "coveralls": "lab -r lcov | ./node_modules/.bin/coveralls"
   },
   "engines": {
     "node": "^5.0.0"
@@ -38,6 +39,7 @@
   },
   "devDependencies": {
     "code": "^2.1.0",
+    "coveralls": "^2.11.6",
     "gulp": "^3.9.0",
     "gulp-eslint": "^1.1.1",
     "lab": "^8.0.1",

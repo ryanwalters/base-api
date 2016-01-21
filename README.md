@@ -1,5 +1,7 @@
 # Base API
 
+[![Build Status](https://travis-ci.org/ryanwalters/base-api.svg?branch=master)] (https://travis-ci.org/ryanwalters/base-api)[![Coverage Status](https://coveralls.io/repos/github/ryanwalters/base-api/badge.svg?branch=github)](https://coveralls.io/github/ryanwalters/base-api?branch=github)
+
 An API built primarily using the [hapi](https://github.com/hapijs/hapi) ecosystem, along with a JWT authentication
 plugin called jot.
 

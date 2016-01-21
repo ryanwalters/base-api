@@ -1,7 +1,11 @@
 # Base API
 
-This API is built on the [hapi](https://github.com/hapijs/hapi) platform, and uses
-[JSON web tokens (JWT)](https://github.com/ryanwalters/jot) for authentication.
+An API built primarily using the [hapi](https://github.com/hapijs/hapi) ecosystem, along with an JWT authentication
+plugin called jot.
+- Authentication - [jot](https://github.com/ryanwalters/jot)
+- Configuration - [confidence](https://github.com/hapijs/confidence)
+- Documentation - [lout](https://github.com/hapijs/lout)
+- ORM - [sequelize](https://github.com/sequelize/sequelize) (postgres)
 
 ## Setup
 

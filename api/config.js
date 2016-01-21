@@ -23,7 +23,7 @@ const config = {
         jwt: {
             $filter: 'env',
             $base: {
-                issuer: 'weddingfoundry.com'
+                issuer: 'example.com'
             },
             production: {
                 secret: process.env.JWT_SECRET
@@ -41,12 +41,12 @@ const config = {
         },
         routes: {
             cors: {
-                origin: ['.weddingfoundry.com']
+                origin: ['.example.com']
             }
         },
         uri: {
             $filter: 'env',
-            production: 'https://api.weddingfoundry.com'
+            production: 'https://api.example.com'
         }
     },
     db: {

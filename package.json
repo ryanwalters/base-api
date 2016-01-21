@@ -1,7 +1,7 @@
 {
-  "name": "weddingfoundry-api",
+  "name": "base-api",
   "version": "1.0.0",
-  "description": "Wedding Foundry API",
+  "description": "Basic account creation and management API",
   "main": "server.js",
   "scripts": {
     "test": "lab -a code -t 100 -L -v"
@@ -11,11 +11,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://bitbucket.org/weddingfoundry/weddingfoundry-api.git"
+    "url": "https://github.com/ryanwalters/base-api.git"
   },
   "keywords": [
-    "Wedding",
-    "Foundry",
     "API"
   ],
   "author": "Ryan Walters",
@@ -38,7 +36,6 @@
     "uuid": "^2.0.1",
     "vision": "^4.0.1"
   },
-  "private": true,
   "devDependencies": {
     "code": "^2.1.0",
     "gulp": "^3.9.0",

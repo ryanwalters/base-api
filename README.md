@@ -1,11 +1,14 @@
 # Base API
 
-An API built primarily using the [hapi](https://github.com/hapijs/hapi) ecosystem, along with an JWT authentication
+An API built primarily using the [hapi](https://github.com/hapijs/hapi) ecosystem, along with a JWT authentication
 plugin called jot.
+
 - Authentication - [jot](https://github.com/ryanwalters/jot)
 - Configuration - [confidence](https://github.com/hapijs/confidence)
 - Documentation - [lout](https://github.com/hapijs/lout)
 - ORM - [sequelize](https://github.com/sequelize/sequelize) (postgres)
+
+The API has endpoints for simple user creation and maintenance, as well as token generation and revocation.
 
 ## Setup
 
